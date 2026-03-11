@@ -1,4 +1,9 @@
 package com.octavian.galactic.model.cargo;
 
-public abstract class CargoItem {
+import com.octavian.galactic.model.SpaceEntity;
+
+public abstract class CargoItem extends SpaceEntity {
+    public CargoItem(String name){
+        super(name);
+    }
 }

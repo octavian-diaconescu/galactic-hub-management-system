@@ -1,4 +1,9 @@
 package com.octavian.galactic.model.station;
 
-public class CrewMember {
+import com.octavian.galactic.model.SpaceEntity;
+
+public class CrewMember extends SpaceEntity {
+    public CrewMember(String name){
+        super(name);
+    }
 }
