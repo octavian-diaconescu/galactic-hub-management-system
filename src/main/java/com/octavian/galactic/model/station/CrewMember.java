@@ -4,12 +4,14 @@ import com.octavian.galactic.model.SpaceEntity;
 
 public class CrewMember extends SpaceEntity implements Comparable<CrewMember> {
 
-    public enum rank{
+    //TODO
+    public enum Rank{
         COMMANDER,
         OFFICER,
         CIVILIAN
     };
 
+    //TODO
     @Override
     public int compareTo(CrewMember other) {
 
