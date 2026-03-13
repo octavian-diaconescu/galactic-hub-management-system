@@ -1,7 +1,43 @@
 package com.octavian.galactic.model.spaceship;
 
+import com.octavian.galactic.model.cargo.CargoItem;
+
+import java.util.LinkedHashMap;
+import java.util.Map;
+
+// Heavy hauler space vehicle
 public class CargoShip extends SpaceShip {
-    public CargoShip(String name) {
-        super(name);
+    private final double maxCargoWeight;
+    private final Map<CargoItem, Integer> cargoManifest = new LinkedHashMap<>();
+
+
+    public CargoShip(String name, int fuelLevel, int hullIntegrity, int maxCrewCapacity, double maxCargoCapacity) {
+        super(name, fuelLevel, hullIntegrity, maxCrewCapacity);
+        if (maxCargoCapacity < 0) {
+            throw new IllegalArgumentException("Max cargo weight cannot be less than 0!");
+        }
+        this.maxCargoWeight = maxCargoCapacity;
+    }
+
+    public void addCargoItem(CargoItem item, int quantity) {
+        if (item == null || quantity <= 0) {
+            System.out.println("[LOGISTICS] Cannot insert a null item or with a quantity of 0!");
+            return;
+        }
+        double currentWeight = cargoManifest
+                .entrySet()
+                .parallelStream()
+                .mapToDouble(e -> e.getKey().getWeight() * e.getValue()).sum();
+
+        if (currentWeight + item.getWeight() * quantity > maxCargoWeight) {
+            System.out.printf("[LOGISTICS] Cannot add [%d] x '%s' due to weight constraints%n", quantity, item.getName());
+            return;
+        }
+        cargoManifest.put(item, cargoManifest.getOrDefault(item, 0) + quantity);
+        System.out.printf("[LOGISTICS] Loaded %s with [%d] x '%s' %n", this.getName(), quantity, item.getName());
+    }
+
+    public void printCargoManifest(){
+        System.out.println("Cargo contents: " + cargoManifest);
     }
 }
