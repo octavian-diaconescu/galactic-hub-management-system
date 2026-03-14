@@ -51,7 +51,7 @@ public abstract class SpaceShip extends SpaceEntity {
         }
         // Check for capacity constraints
         if (crewMembers.size() + 1 > maxCrewCapacity) {
-            System.out.printf("[%s] %s is full!%n", this.getClass().getSimpleName(), this.getName());
+            System.out.printf("[MANIFEST] (%s)'%s' is at max crew capacity%n", this.getClass().getSimpleName(), this.getName());
             return;
         }
         // Finally, add the crew member
@@ -59,7 +59,7 @@ public abstract class SpaceShip extends SpaceEntity {
             System.out.printf("[MANIFEST] Welcome aboard '%s', %s!%n", this.getName(), crew.getName());
         }
         else{
-            System.out.printf("[MANIFEST] %s is already registered on this ship.%n", crew.getName());
+            System.out.printf("[MANIFEST] '%s' is already registered on this ship.%n", crew.getName());
         }
     }
 
@@ -72,4 +72,5 @@ public abstract class SpaceShip extends SpaceEntity {
         // Return an unmodifiable set to enforce the use of removeCrewMember and addCrewMember methods
         return Collections.unmodifiableSet(crewMembers);
     }
+
 }

@@ -2,6 +2,7 @@ package com.octavian.galactic.model.spaceship;
 
 import com.octavian.galactic.model.cargo.CargoItem;
 
+import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -37,7 +38,11 @@ public class CargoShip extends SpaceShip {
         System.out.printf("[LOGISTICS] Loaded %s with [%d] x '%s' %n", this.getName(), quantity, item.getName());
     }
 
-    public void printCargoManifest(){
-        System.out.println("Cargo contents: " + cargoManifest);
+    public Map<CargoItem, Integer> getCargoManifest(){
+        return Collections.unmodifiableMap(cargoManifest);
+    }
+
+    public void printCargoManifest() {
+        System.out.println("[LOGISTICS] Cargo contents: " + cargoManifest);
     }
 }

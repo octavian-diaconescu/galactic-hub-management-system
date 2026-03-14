@@ -4,6 +4,7 @@ import com.octavian.galactic.model.SpaceEntity;
 
 public abstract class CargoItem extends SpaceEntity {
     private final double weight;
+
     public CargoItem(String name, double weight){
         super(name);
         if(weight <= 0){
