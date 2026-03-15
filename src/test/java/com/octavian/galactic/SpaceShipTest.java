@@ -23,7 +23,7 @@ public class SpaceShipTest {
         // Arrange
         CargoShip ship = new CargoShip("Alpha 1", 100, 100, 2, 1000.0);
         CrewMember bob = new CrewMember("Bob", CrewMember.Rank.COMMANDER);
-        CrewMember michael = new CrewMember("Michael ", CrewMember.Rank.COMMANDER);
+        CrewMember michael = new CrewMember("Michael", CrewMember.Rank.COMMANDER);
 
         // Act
         ship.addCrewMember(michael);
