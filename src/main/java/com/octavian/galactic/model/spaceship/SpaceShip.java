@@ -2,6 +2,7 @@ package com.octavian.galactic.model.spaceship;
 
 import com.octavian.galactic.model.SpaceEntity;
 import com.octavian.galactic.model.station.CrewMember;
+import com.octavian.galactic.model.Size;
 
 import java.util.Set;
 import java.util.TreeSet;
@@ -13,14 +14,20 @@ public abstract class SpaceShip extends SpaceEntity {
     private int fuelLevel; // 0 to 100 reinforced in the setter function
     private int hullIntegrity; // 0 to 100 reinforced in the setter function
     private final int maxCrewCapacity;
+    private final Size shipSize;
 
     private final Set<CrewMember> crewMembers = new TreeSet<>();
 
-    public SpaceShip(String name, int fuelLevel, int hullIntegrity, int maxCrewCapacity) {
+    public SpaceShip(String name, int fuelLevel, int hullIntegrity, int maxCrewCapacity, Size shipSize) {
         super(name);
         setFuelLevel(fuelLevel);
         setHullIntegrity(hullIntegrity);
         this.maxCrewCapacity = maxCrewCapacity;
+        this.shipSize = shipSize;
+    }
+
+    public Size getShipSize() {
+        return shipSize;
     }
 
     public void setFuelLevel(int fuelLevel) {

@@ -1,12 +1,14 @@
 package com.octavian.galactic.model.spaceship;
 
+import com.octavian.galactic.model.Size;
+
 // A fast, light ship for exploration (doesn't store cargo)
 public class ScoutShip extends SpaceShip {
     private int sensorRange; // How far it can detect other objects
     private boolean isStealthEnabled; // Toggle for radar visibility
 
-    public ScoutShip(String name, int fuelLevel, int hullIntegrity, int maxCrewCapacity, int sensorRange){
-        super(name, fuelLevel, hullIntegrity, maxCrewCapacity);
+    public ScoutShip(String name, Size size, int fuelLevel, int hullIntegrity, int maxCrewCapacity, int sensorRange){
+        super(name, fuelLevel, hullIntegrity, maxCrewCapacity, size);
         setSensorRange(sensorRange);
         setStealthEnabled(false);
     }

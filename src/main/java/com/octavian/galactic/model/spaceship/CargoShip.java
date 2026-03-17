@@ -1,5 +1,6 @@
 package com.octavian.galactic.model.spaceship;
 
+import com.octavian.galactic.model.Size;
 import com.octavian.galactic.model.cargo.CargoItem;
 
 import java.util.Collections;
@@ -12,8 +13,8 @@ public class CargoShip extends SpaceShip {
     private final Map<CargoItem, Integer> cargoManifest = new LinkedHashMap<>();
 
 
-    public CargoShip(String name, int fuelLevel, int hullIntegrity, int maxCrewCapacity, double maxCargoCapacity) {
-        super(name, fuelLevel, hullIntegrity, maxCrewCapacity);
+    public CargoShip(String name,  Size size, int fuelLevel, int hullIntegrity, int maxCrewCapacity, double maxCargoCapacity) {
+        super(name, fuelLevel, hullIntegrity, maxCrewCapacity, size);
         if (maxCargoCapacity < 0) {
             throw new IllegalArgumentException("Max cargo weight cannot be less than 0!");
         }
