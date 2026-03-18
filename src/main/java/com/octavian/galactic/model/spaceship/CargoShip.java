@@ -28,7 +28,7 @@ public class CargoShip extends SpaceShip {
         }
         double currentWeight = cargoManifest
                 .entrySet()
-                .parallelStream()
+                .stream()
                 .mapToDouble(e -> e.getKey().getWeight() * e.getValue()).sum();
 
         if (currentWeight + item.getWeight() * quantity > maxCargoWeight) {

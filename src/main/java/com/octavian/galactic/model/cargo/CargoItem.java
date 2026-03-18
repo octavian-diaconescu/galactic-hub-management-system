@@ -5,20 +5,21 @@ import com.octavian.galactic.model.SpaceEntity;
 // A CargoItem derived object describes a type of cargo a cargo ship can hold
 public abstract class CargoItem extends SpaceEntity {
     private final double weight;
-    private String description = "N/A";
+    private String description;
 
     public CargoItem(String name, double weight){
         super(name);
-        if(weight <= 0){
-            throw new IllegalArgumentException("Cargo weight cannot be 0 or less!");
+        if(weight < 0){
+            throw new IllegalArgumentException("Cargo weight cannot be less than 0");
         }
         this.weight = weight;
+        description = "N/A";
     }
 
     public CargoItem(String name, double weight, String description){
         super(name);
         if(weight < 0){
-            throw new IllegalArgumentException("Cargo weight cannot be less than 0!");
+            throw new IllegalArgumentException("Cargo weight cannot be less than 0");
         }
         this.weight = weight;
         this.description = description;

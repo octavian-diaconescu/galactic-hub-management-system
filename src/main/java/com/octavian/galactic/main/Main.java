@@ -5,7 +5,7 @@ package com.octavian.galactic.main;
 //import com.octavian.galactic.model.cargo.HazardousCargo;
 
 public class Main {
-    static void main() {
+    public static void main(String[] args) {
 
     }
 }

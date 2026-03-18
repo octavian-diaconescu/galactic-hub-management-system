@@ -5,7 +5,7 @@ import com.octavian.galactic.model.SpaceEntity;
 import java.util.Objects;
 
 public class CrewMember extends SpaceEntity implements Comparable<CrewMember> {
-    public String species;
+    private String species;
     private final Rank rank;
 
     public enum Rank {

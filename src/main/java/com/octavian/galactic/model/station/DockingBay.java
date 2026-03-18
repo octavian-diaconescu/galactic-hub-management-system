@@ -11,20 +11,31 @@ public class DockingBay extends SpaceEntity {
     private SpaceShip spaceShip; // Can be null if the respective bay is empty
 
 
-    public DockingBay(String name, Size baySize, boolean isOccupied){
+    public DockingBay(String name, Size baySize, boolean isOccupied) {
         super(name);
         this.baySize = baySize;
         this.isOccupied = isOccupied;
     }
-    public void setSpaceShip(SpaceShip spaceShip){
+
+    public void dockSpaceShip(SpaceShip spaceShip) {
+        if (spaceShip.getShipSize().ordinal() > baySize.ordinal()) {
+            System.out.println("[BSP] Ship is too big for the current bay"); // BSP = Bay Service Provider
+            return;
+        }
         this.spaceShip = spaceShip;
+        this.isOccupied = true;
+    }
+
+    public void undockSpaceShip() {
+        this.spaceShip = null;
+        System.out.println("[BSP] SpaceShip has been undocked");
     }
 
     public Size getBaySize() {
         return baySize;
     }
 
-    public SpaceShip getSpaceShip(){
+    public SpaceShip getSpaceShip() {
         return this.spaceShip;
     }
 
