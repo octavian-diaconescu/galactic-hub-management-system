@@ -1,6 +1,7 @@
 package com.octavian.galactic;
 
 import com.octavian.galactic.model.Size;
+import com.octavian.galactic.model.cargo.HazardousCargo;
 import com.octavian.galactic.model.spaceship.CargoShip;
 import com.octavian.galactic.model.spaceship.ScoutShip;
 import com.octavian.galactic.model.spaceship.SpaceShip;
@@ -11,7 +12,6 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import java.util.Set;
-import java.util.TreeSet;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -92,4 +92,41 @@ public class HubServiceTest {
         assertEquals(3, cargoShip.getCrewMembers().size(), "RATS should now have 3 members");
         assertTrue(cargoShip.getCrewMembers().contains(guestCrewMember), "Michael Bay should be on RATS");
     }
+
+    @Test
+    @DisplayName("Should scan for hazardous cargo on a docked cargo ship")
+    void testScanCargoShipForHazardousCargo() {
+        // Arrange
+        HubService mainHub = new HubService("MAIN HUB");
+        DockingBay dockingBay = new DockingBay("Earth-Dock-1", Size.LARGE, false);
+
+        CargoShip cargoShip = new CargoShip("Alpha 1", Size.SMALL, 88, 100, 20, 25.75);
+        ScoutShip ship = new ScoutShip("Alpha 1", Size.LARGE, 100, 2, 5, 10);
+
+        HazardousCargo hc = new HazardousCargo("Radioactive milk", 2.5, 8, "Lead-lined");
+        HazardousCargo hazardousCargoWithDescription = new HazardousCargo("Antimatter jelly", 5, 0, "Regular", "A mysterious jelly extracted from unknown sources");
+        HazardousCargo hazardousCargoWithDescription2 = new HazardousCargo("Schrodinger's matter", 0, 0, "Paradoxical", "Is it solid? Is it liquid? Is it gas?");
+
+        // Act
+        cargoShip.addCargoItem(hc, 1);
+        cargoShip.addCargoItem(hazardousCargoWithDescription, 1);
+        cargoShip.addCargoItem(hazardousCargoWithDescription2, 1);
+
+        mainHub.buildDockingBay(dockingBay);
+        mainHub.registerShip(cargoShip);
+        mainHub.registerShip(ship);
+        mainHub.assignShipToBay(cargoShip.getId(), 1);
+        boolean shouldReturnTrue = mainHub.scanShipForHazards(cargoShip.getId());
+
+        mainHub.unassignShipFromBay(cargoShip.getId());
+        mainHub.assignShipToBay(ship.getId(), 1);
+
+        boolean shouldReturnFalse = mainHub.scanShipForHazards(ship.getId());
+
+        // Assert
+        assertTrue(shouldReturnTrue);
+        assertFalse(shouldReturnFalse);
+    }
+
+
 }

@@ -40,6 +40,7 @@ public class DockingBay extends SpaceEntity {
         return this.spaceShip;
     }
 
+    // Returns the occupation state
     public boolean isOccupied() {
         return isOccupied;
     }

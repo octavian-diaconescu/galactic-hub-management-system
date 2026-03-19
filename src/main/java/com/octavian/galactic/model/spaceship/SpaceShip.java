@@ -70,9 +70,9 @@ public abstract class SpaceShip extends SpaceEntity {
         }
     }
 
-    public boolean removeCrewMember(UUID crewID) {
+    public void removeCrewMember(UUID crewID) {
         // Remove the crew member by UUID
-        return this.crewMembers.removeIf(m -> m.getId().equals(crewID));
+        this.crewMembers.removeIf(m -> m.getId().equals(crewID));
     }
 
     public Set<CrewMember> getCrewMembers() {

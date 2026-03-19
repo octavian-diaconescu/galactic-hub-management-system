@@ -35,7 +35,6 @@ public class SpaceShipTest {
         assertTrue(ship.getCrewMembers().contains(bob));
         assertTrue(ship.getCrewMembers().contains(michael));
 
-        System.out.println("Crew currently on board: " + ship.getCrewMembers());
     }
 
     @Test

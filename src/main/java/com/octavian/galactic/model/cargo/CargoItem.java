@@ -5,7 +5,7 @@ import com.octavian.galactic.model.SpaceEntity;
 // A CargoItem derived object describes a type of cargo a cargo ship can hold
 public abstract class CargoItem extends SpaceEntity {
     private final double weight;
-    private String description;
+    private final String description;
 
     public CargoItem(String name, double weight){
         super(name);
@@ -29,6 +29,7 @@ public abstract class CargoItem extends SpaceEntity {
     public double getWeight() {
         return weight;
     }
+
 
     public void printItemInfo(){
         System.out.printf("*%s:%.2f(Tonnes)%n", name, weight);

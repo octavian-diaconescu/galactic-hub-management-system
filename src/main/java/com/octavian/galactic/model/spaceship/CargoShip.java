@@ -29,7 +29,8 @@ public class CargoShip extends SpaceShip {
         double currentWeight = cargoManifest
                 .entrySet()
                 .stream()
-                .mapToDouble(e -> e.getKey().getWeight() * e.getValue()).sum();
+                .mapToDouble(e -> e.getKey().getWeight() * e.getValue())
+                .sum();
 
         if (currentWeight + item.getWeight() * quantity > maxCargoWeight) {
             System.out.printf("[LOGISTICS] Cannot add [%d] x '%s' due to weight constraints%n", quantity, item.getName());
@@ -44,6 +45,7 @@ public class CargoShip extends SpaceShip {
     }
 
     public void printCargoManifest() {
+        System.out.printf("[INSPECTION] Here is the cargo manifest for the ship '%s' %n", this.getName());
         System.out.println("[LOGISTICS] Cargo contents: " + cargoManifest);
     }
 }

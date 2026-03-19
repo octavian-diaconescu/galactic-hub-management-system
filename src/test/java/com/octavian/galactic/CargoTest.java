@@ -23,7 +23,6 @@ public class CargoTest {
 
         // Act
         cargoShip.setFuelLevel(100);
-
         System.out.printf("Ship [%s] has been refueled%n", cargoShip.getName());
 
         cargoShip.addCargoItem(hc, 2);
@@ -35,8 +34,10 @@ public class CargoTest {
         hazardousCargoWithDescription.printItemInfo();
         hazardousCargoWithDescription2.printItemInfo();
 
-        System.out.printf("[INSPECTION] Here is the cargo manifest for the ship '%s' %n", cargoShip.getName());
         cargoShip.printCargoManifest();
+
+        // Assert
+        assertEquals(4, cargoShip.getCargoManifest().size());
     }
     @Test
     @DisplayName("Shouldn't add cargo over maxCargoCapacity")
