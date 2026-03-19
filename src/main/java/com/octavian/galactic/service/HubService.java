@@ -9,7 +9,7 @@ import java.util.*;
 public class HubService {
     private final List<SpaceShip> registeredShips = new ArrayList<>(); // Keep a record of every ship that has ever visited;
     private final Map<Integer, DockingBay> dockingBays = new HashMap<>(); // Manage physical locations
-    private String name;
+    private final String name;
 
     public HubService(String name) {
         this.name = name;
@@ -19,9 +19,6 @@ public class HubService {
         return name;
     }
 
-    public void setName(String name) {
-        this.name = name;
-    }
     public List<SpaceShip> getRegisteredShips() {
         return Collections.unmodifiableList(registeredShips);
     }
@@ -65,7 +62,7 @@ public class HubService {
             throw new IllegalArgumentException("[HUB] Error: Ship cannot be null");
         }
         if (registeredShips.contains(ship)) {
-            System.out.println("[HUB] Error: Ship already in history");
+            System.out.printf("[HUB] Error: Ship '%s' already in history", ship.getName());
             return;
         }
         registeredShips.add(ship);
@@ -84,7 +81,7 @@ public class HubService {
                 .ifPresentOrElse(
                         ship -> {
                             if (bay.isOccupied()) {
-                                System.out.println("[HUB] Error: Docking Bay " + bayNumber + " is already occupied");
+                                System.out.println("[HUB] Error: Docking Bay " + bayNumber + " is already occupied by" + ship.getName());
 
                             } else if (ship.getShipSize().compareTo(bay.getBaySize()) <= 0) {
                                 bay.dockSpaceShip(ship);
@@ -108,9 +105,7 @@ public class HubService {
                 .filter(entry -> entry.getValue().isOccupied() && entry.getValue().getSpaceShip().getId().equals(id))
                 .findFirst()
                 .ifPresentOrElse(
-                        bayEntry -> {
-                            bayEntry.getValue().undockSpaceShip();
-                        },
+                        bayEntry -> bayEntry.getValue().undockSpaceShip(),
                         () -> System.out.println("[HUB] Error: Ship (" + id + ") does not exist")
                 );
     }
@@ -125,11 +120,9 @@ public class HubService {
                 .stream()
                 .filter(entry -> entry.getValue().isOccupied() && entry.getValue().getSpaceShip().getId().equals(id))
                 .findFirst()
-                .ifPresentOrElse(entry -> {
-                            entry.getValue().getSpaceShip().addCrewMember(crew);
-                        },
+                .ifPresentOrElse(entry ->
+                                entry.getValue().getSpaceShip().addCrewMember(crew),
                         () -> System.out.println("[HUB] Error: Ship (" + id + ") not found")
-
                 );
     }
 

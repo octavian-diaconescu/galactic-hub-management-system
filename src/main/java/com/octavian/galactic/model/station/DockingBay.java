@@ -28,6 +28,7 @@ public class DockingBay extends SpaceEntity {
 
     public void undockSpaceShip() {
         this.spaceShip = null;
+        this.isOccupied = false;
         System.out.println("[BSP] SpaceShip has been undocked");
     }
 
@@ -43,7 +44,7 @@ public class DockingBay extends SpaceEntity {
         return isOccupied;
     }
 
-    public void setOccupied(boolean occupied) {
-        isOccupied = occupied;
-    }
+//    public void setOccupied(boolean occupied) {
+//        isOccupied = occupied;
+//    }
 }
