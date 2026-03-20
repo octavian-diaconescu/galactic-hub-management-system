@@ -16,6 +16,7 @@ import java.util.Set;
 import static org.junit.jupiter.api.Assertions.*;
 
 public class HubServiceTest {
+    // TODO: write a @BeforeEach section(should have googled this earlier) and tests for the freshly implemented methods
 
     @Test
     @DisplayName("Should successfully create a hub and call the implemented methods so far")
