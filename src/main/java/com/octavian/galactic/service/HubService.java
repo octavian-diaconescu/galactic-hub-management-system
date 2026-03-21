@@ -1,12 +1,8 @@
 package com.octavian.galactic.service;
 
-import com.octavian.galactic.model.cargo.CargoItem;
-import com.octavian.galactic.model.cargo.HazardousCargo;
-import com.octavian.galactic.model.spaceship.CargoShip;
-import com.octavian.galactic.model.spaceship.ScoutShip;
-import com.octavian.galactic.model.spaceship.SpaceShip;
-import com.octavian.galactic.model.station.CrewMember;
-import com.octavian.galactic.model.station.DockingBay;
+import com.octavian.galactic.model.cargo.*;
+import com.octavian.galactic.model.spaceship.*;
+import com.octavian.galactic.model.station.*;
 
 import java.util.*;
 import java.util.stream.Collectors;

@@ -50,16 +50,16 @@ public class HubServiceTest {
         cargoShip1 = new CargoShip("Alpha 1", Size.SMALL, 88, 100, 20, 25.75);
         scoutShip = new ScoutShip("Alpha 1", Size.LARGE, 90, 90, 5, 10);
 
-        guestCrewMember = new CrewMember("Michael Bay", CrewMember.Rank.GUEST, CrewMember.Species.Korvax);
+        guestCrewMember = new CrewMember("Michael Bay", CrewMember.Rank.GUEST, CrewMember.Species.KORVAX);
         scoutShipCrewMembers = Set.of(
-                new CrewMember("John Doe", CrewMember.Rank.COMMANDER, CrewMember.Species.Human),
-                new CrewMember("Mark Twain", CrewMember.Rank.GUEST, CrewMember.Species.Human),
-                new CrewMember("John Cena", CrewMember.Rank.SPECIALIST, CrewMember.Species.Vykeen),
-                new CrewMember("Clark Kent", CrewMember.Rank.ENGINEER, CrewMember.Species.Atlas)
+                new CrewMember("John Doe", CrewMember.Rank.COMMANDER, CrewMember.Species.HUMAN),
+                new CrewMember("Mark Twain", CrewMember.Rank.GUEST, CrewMember.Species.HUMAN),
+                new CrewMember("John Cena", CrewMember.Rank.SPECIALIST, CrewMember.Species.VYKEEN),
+                new CrewMember("Clark Kent", CrewMember.Rank.ENGINEER, CrewMember.Species.ATLAS)
         );
        cargoShipCrewMembers = Set.of(
-                new CrewMember("John Doe", CrewMember.Rank.COMMANDER, CrewMember.Species.Korvax),
-                new CrewMember("Matthew Murdock", CrewMember.Rank.SPECIALIST, CrewMember.Species.Atlas)
+                new CrewMember("John Doe", CrewMember.Rank.COMMANDER, CrewMember.Species.KORVAX),
+                new CrewMember("Matthew Murdock", CrewMember.Rank.SPECIALIST, CrewMember.Species.ATLAS)
         );
 
         hc = new HazardousCargo("Radioactive milk", 2.5, 8, "Lead-lined");

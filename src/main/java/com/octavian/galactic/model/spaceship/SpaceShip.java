@@ -1,5 +1,6 @@
 package com.octavian.galactic.model.spaceship;
 
+import com.octavian.galactic.model.Fuellable;
 import com.octavian.galactic.model.SpaceEntity;
 import com.octavian.galactic.model.station.CrewMember;
 import com.octavian.galactic.model.Size;
@@ -10,7 +11,7 @@ import java.util.Collections;
 import java.util.UUID;
 
 // The base for all flying vehicles
-public abstract class SpaceShip extends SpaceEntity {
+public abstract class SpaceShip extends SpaceEntity implements Fuellable {
     private int fuelLevel; // 0 to 100 reinforced in the setter function
     private int hullIntegrity; // 0 to 100 reinforced in the setter function
     private final int maxCrewCapacity;
@@ -37,8 +38,17 @@ public abstract class SpaceShip extends SpaceEntity {
         this.fuelLevel = fuelLevel;
     }
 
+    @Override
     public int getFuelLevel() {
         return fuelLevel;
+    }
+    @Override
+    public boolean fuelTankIsEmpty(){
+        return fuelLevel == 0;
+    }
+    @Override
+    public void refuel(int amount){
+        this.fuelLevel += amount;
     }
 
     public int getHullIntegrity() {

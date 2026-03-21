@@ -23,9 +23,9 @@ public class DockingBayTest {
         CargoShip titanHauler = new CargoShip("Titan Hauler", Size.MEDIUM, 85, 90, 5, 100.88);
 
         List<CrewMember> crewManifest = List.of(
-                new CrewMember("Michael Bay", CrewMember.Rank.COMMANDER, CrewMember.Species.Gek),
-                new CrewMember("Leonardo DiCaprio", CrewMember.Rank.GUEST, CrewMember.Species.Human),
-                new CrewMember("Matthew McConaughey", CrewMember.Rank.ENGINEER, CrewMember.Species.Atlas)
+                new CrewMember("Michael Bay", CrewMember.Rank.COMMANDER, CrewMember.Species.GEK),
+                new CrewMember("Leonardo DiCaprio", CrewMember.Rank.GUEST, CrewMember.Species.HUMAN),
+                new CrewMember("Matthew McConaughey", CrewMember.Rank.ENGINEER, CrewMember.Species.ATLAS)
         );
         Map<CargoItem, Integer> cargoManifest = new LinkedHashMap<>(Map.of(
                 new HazardousCargo("Antimatter jelly", 5, 0, "Regular", "A mysterious jelly extracted from unknown sources"), 1,

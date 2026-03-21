@@ -18,11 +18,11 @@ public class CrewMember extends SpaceEntity implements Comparable<CrewMember> {
     }
 
     public enum Species{
-        Human,
-        Gek,
-        Korvax,
-        Vykeen,
-        Atlas
+        HUMAN,
+        GEK,
+        KORVAX,
+        VYKEEN,
+        ATLAS
     }
 
     public CrewMember(String name, Rank rank, Species species) {
