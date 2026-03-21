@@ -2,46 +2,74 @@ package com.octavian.galactic;
 
 import com.octavian.galactic.model.Size;
 import com.octavian.galactic.model.cargo.HazardousCargo;
-import com.octavian.galactic.model.spaceship.CargoShip;
-import com.octavian.galactic.model.spaceship.ScoutShip;
-import com.octavian.galactic.model.spaceship.SpaceShip;
-import com.octavian.galactic.model.station.CrewMember;
-import com.octavian.galactic.model.station.DockingBay;
+import com.octavian.galactic.model.spaceship.*;
+import com.octavian.galactic.model.station.*;
 import com.octavian.galactic.service.HubService;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
+import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 public class HubServiceTest {
-    // TODO: write a @BeforeEach section(should have googled this earlier) and tests for the freshly implemented methods
+    private HubService hubService;
+    private HubService mainHub;
 
-    @Test
-    @DisplayName("Should successfully create a hub and call the implemented methods so far")
-    void testCreateHubAndCallImplementationMethods() {
-        // Arrange
-        HubService hubService = new HubService("HUB ALPHA");
+    private DockingBay dockingBay;
+    private DockingBay dockingBay2;
+    private DockingBay dockingBay3;
 
-        DockingBay dockingBay = new DockingBay("Earth-Dock-1", Size.LARGE, false);
-        DockingBay dockingBay2 = new DockingBay("Earth-Dock-2", Size.LARGE, false);
+    private SpaceShip spaceShip;
+    private SpaceShip cargoShip;
+    private CargoShip cargoShip1;
+    private ScoutShip scoutShip;
 
-        SpaceShip spaceShip = new ScoutShip("TARS", Size.MEDIUM, 100, 100, 10, 200);
-        SpaceShip cargoShip = new CargoShip("RATS", Size.SMALL, 100, 100, 3, 100.88);
+    private HazardousCargo hc;
+    private HazardousCargo hazardousCargoWithDescription;
+    private HazardousCargo hazardousCargoWithDescription2;
 
-        CrewMember guestCrewMember = new CrewMember("Michael Bay", CrewMember.Rank.GUEST);
-        Set<CrewMember> scoutShipCrewMembers = Set.of(
+    private CrewMember guestCrewMember;
+    private Set<CrewMember> scoutShipCrewMembers;
+    private Set<CrewMember> cargoShipCrewMembers;
+
+    @BeforeEach
+    void setUp(){
+        mainHub = new HubService("MAIN HUB");
+        hubService = new HubService("HUB ALPHA");
+
+        dockingBay = new DockingBay("Earth-Dock-1", Size.LARGE, false);
+        dockingBay2 = new DockingBay("Earth-Dock-2", Size.LARGE, false);
+        dockingBay3 = new DockingBay("Earth-Dock-1", Size.LARGE, false);
+
+        spaceShip = new ScoutShip("TARS", Size.MEDIUM, 100, 100, 10, 200);
+        cargoShip = new CargoShip("RATS", Size.SMALL, 50, 80, 3, 5000);
+        cargoShip1 = new CargoShip("Alpha 1", Size.SMALL, 88, 100, 20, 25.75);
+        scoutShip = new ScoutShip("Alpha 1", Size.LARGE, 90, 90, 5, 10);
+
+        guestCrewMember = new CrewMember("Michael Bay", CrewMember.Rank.GUEST);
+        scoutShipCrewMembers = Set.of(
                 new CrewMember("John Doe", CrewMember.Rank.COMMANDER),
                 new CrewMember("Mark Twain", CrewMember.Rank.GUEST),
                 new CrewMember("John Cena", CrewMember.Rank.SPECIALIST),
                 new CrewMember("Clark Kent", CrewMember.Rank.ENGINEER)
         );
-        Set<CrewMember> cargoShipCrewMembers = Set.of(
+       cargoShipCrewMembers = Set.of(
                 new CrewMember("John Doe", CrewMember.Rank.COMMANDER),
                 new CrewMember("Matthew Murdock", CrewMember.Rank.SPECIALIST)
         );
 
+        hc = new HazardousCargo("Radioactive milk", 2.5, 8, "Lead-lined");
+        hazardousCargoWithDescription = new HazardousCargo("Antimatter jelly", 5, 0, "Regular", "A mysterious jelly extracted from unknown sources");
+        hazardousCargoWithDescription2 = new HazardousCargo("Schrodinger's matter", 0, 0, "Paradoxical", "Is it solid? Is it liquid? Is it gas?");
+    }
+
+    @Test
+    @DisplayName("Should successfully create a hub and call the implemented methods so far")
+    void testCreateHubAndCallImplementationMethods() {
         // Act
         scoutShipCrewMembers.forEach(spaceShip::addCrewMember);
         cargoShipCrewMembers.forEach(cargoShip::addCrewMember);
@@ -65,6 +93,7 @@ public class HubServiceTest {
         hubService.removeDockingBay(dockingBay2.getId());
 
         // Assert
+        hubService.generatePersonnelReport();
 
         // Verify Ship Registry
         // Both ships are now successfully registered
@@ -97,37 +126,125 @@ public class HubServiceTest {
     @Test
     @DisplayName("Should scan for hazardous cargo on a docked cargo ship")
     void testScanCargoShipForHazardousCargo() {
-        // Arrange
-        HubService mainHub = new HubService("MAIN HUB");
-        DockingBay dockingBay = new DockingBay("Earth-Dock-1", Size.LARGE, false);
-
-        CargoShip cargoShip = new CargoShip("Alpha 1", Size.SMALL, 88, 100, 20, 25.75);
-        ScoutShip ship = new ScoutShip("Alpha 1", Size.LARGE, 100, 2, 5, 10);
-
-        HazardousCargo hc = new HazardousCargo("Radioactive milk", 2.5, 8, "Lead-lined");
-        HazardousCargo hazardousCargoWithDescription = new HazardousCargo("Antimatter jelly", 5, 0, "Regular", "A mysterious jelly extracted from unknown sources");
-        HazardousCargo hazardousCargoWithDescription2 = new HazardousCargo("Schrodinger's matter", 0, 0, "Paradoxical", "Is it solid? Is it liquid? Is it gas?");
-
         // Act
-        cargoShip.addCargoItem(hc, 1);
-        cargoShip.addCargoItem(hazardousCargoWithDescription, 1);
-        cargoShip.addCargoItem(hazardousCargoWithDescription2, 1);
+        cargoShip1.addCargoItem(hc, 1);
+        cargoShip1.addCargoItem(hazardousCargoWithDescription, 1);
+        cargoShip1.addCargoItem(hazardousCargoWithDescription2, 1);
 
-        mainHub.buildDockingBay(dockingBay);
-        mainHub.registerShip(cargoShip);
-        mainHub.registerShip(ship);
-        mainHub.assignShipToBay(cargoShip.getId(), 1);
-        boolean shouldReturnTrue = mainHub.scanShipForHazards(cargoShip.getId());
+        mainHub.buildDockingBay(dockingBay3);
+        mainHub.registerShip(cargoShip1);
+        mainHub.registerShip(scoutShip);
+        mainHub.assignShipToBay(cargoShip1.getId(), 1);
+        boolean shouldReturnTrue = mainHub.scanShipForHazards(cargoShip1.getId());
 
-        mainHub.unassignShipFromBay(cargoShip.getId());
-        mainHub.assignShipToBay(ship.getId(), 1);
+        mainHub.unassignShipFromBay(cargoShip1.getId());
+        mainHub.assignShipToBay(scoutShip.getId(), 1);
 
-        boolean shouldReturnFalse = mainHub.scanShipForHazards(ship.getId());
+        boolean shouldReturnFalse = mainHub.scanShipForHazards(scoutShip.getId());
 
         // Assert
         assertTrue(shouldReturnTrue);
         assertFalse(shouldReturnFalse);
     }
 
+    @Test
+    @DisplayName("Should correctly calculate billing for a CargoShip and restore its stats")
+    void testCalculateDockingFeesPerShip_CargoShip() {
+        // Arrange
+        hubService.buildDockingBay(dockingBay);
+        hubService.registerShip(cargoShip);
+        hubService.assignShipToBay(cargoShip.getId(), 1);
+
+        // Act
+        double bill = hubService.calculateDockingFeesPerShip(cargoShip.getId());
+
+        // Assert
+        assertEquals(1137.5, bill, "Billing calculation for CargoShip is incorrect");
+        assertEquals(100, cargoShip.getFuelLevel(), "Fuel should be refilled to 100");
+        assertEquals(100, cargoShip.getHullIntegrity(), "Hull should be repaired to 100");
+    }
+
+    @Test
+    @DisplayName("Should sum up total revenue for all docked ships")
+    void testCalculateTotalDockingFees() {
+        // Arrange
+        hubService.buildDockingBay(dockingBay);
+        hubService.buildDockingBay(dockingBay2);
+        hubService.registerShip(cargoShip);
+        hubService.registerShip(scoutShip);
+
+        hubService.assignShipToBay(cargoShip.getId(), 1);
+        hubService.assignShipToBay(scoutShip.getId(), 2);
+
+        // Act
+        double totalRevenue = hubService.calculateTotalDockingFees();
+
+        // Assert
+        assertEquals(1412.5, totalRevenue, "Total revenue aggregation is incorrect");
+    }
+
+    @Test
+    @DisplayName("Should return the correct docking bays based on occupied status")
+    void testGetBaysByStatus() {
+        // Arrange
+        // Build 3 bays, but only dock 2 ships.
+        hubService.buildDockingBay(dockingBay);  // Bay 1
+        hubService.buildDockingBay(dockingBay2); // Bay 2
+        hubService.buildDockingBay(dockingBay3); // Bay 3
+
+        hubService.registerShip(cargoShip);
+        hubService.registerShip(scoutShip);
+
+        hubService.assignShipToBay(cargoShip.getId(), 1);
+        hubService.assignShipToBay(scoutShip.getId(), 2);
+
+        // Act
+        List<DockingBay> occupiedBays = hubService.getBaysByStatus(true);
+        List<DockingBay> emptyBays = hubService.getBaysByStatus(false);
+
+        // Assert
+        assertEquals(2, occupiedBays.size(), "Should find 2 occupied bays");
+        assertEquals(1, emptyBays.size(), "Should find 1 empty bay (Bay 3)");
+    }
+
+    @Test
+    @DisplayName("Should undock all ships during an emergency evacuation")
+    void testEmergencyEvacuation() {
+        // Arrange
+        // Give the ship a crew member, build a bay, and dock the ship so there is someone to evacuate
+        cargoShip.addCrewMember(guestCrewMember);
+        hubService.buildDockingBay(dockingBay);
+        hubService.registerShip(cargoShip);
+        hubService.assignShipToBay(cargoShip.getId(), 1);
+
+        // Act
+        hubService.emergencyEvacuation();
+
+        // Assert
+        List<DockingBay> occupiedBays = hubService.getBaysByStatus(true);
+        assertEquals(0, occupiedBays.size(), "All bays should be empty after an evacuation");
+
+        // Ensure ships are actually detached from the bays
+        assertNull(hubService.getDockingBays().get(1).getSpaceShip(), "Bay 1 should not hold a ship reference");
+    }
+
+    @Test
+    @DisplayName("Should find the heaviest CargoShip")
+    void testFindHeaviestCargoShip() {
+        // Arrange
+        // Load up RATS so it is heavier than Alpha 1, then register both
+        ((CargoShip) cargoShip).addCargoItem(hc, 5); // Add 12.5 tonnes to RATS
+        cargoShip1.addCargoItem(hc, 1); // Add 2.5 tonnes to Alpha 1
+
+        hubService.registerShip(cargoShip);
+        hubService.registerShip(cargoShip1);
+
+        // Act
+        Optional<CargoShip> heaviest = hubService.findHeaviestCargoShip("all time");
+
+        // Assert
+        assertTrue(heaviest.isPresent());
+        assertEquals(cargoShip, heaviest.get(), "RATS should be the heaviest ship");
+    }
 
 }

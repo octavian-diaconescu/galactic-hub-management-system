@@ -71,7 +71,7 @@ public class HubService {
             throw new IllegalArgumentException("[HUB] Error: Ship cannot be null");
         }
         if (registeredShips.contains(ship)) {
-            System.out.printf("[HUB] Error: Ship '%s' already in history", ship.getName());
+            System.out.printf("[HUB] Error: Ship '%s' already in history%n", ship.getName());
             return;
         }
         registeredShips.add(ship);
@@ -194,7 +194,7 @@ public class HubService {
                 return false;
             }
 
-            System.out.println("[HUB] HAZARDOUS MATERIALS DETECTED. Printing safety report...");
+            System.out.println("[HUB] HAZARDOUS MATERIALS DETECTED. Printing unsafe cargo report...");
             System.out.println(hazardousCargoManifest);
             return true;
         } else {
@@ -214,7 +214,7 @@ public class HubService {
         for (SpaceShip ship : registeredShips) {
             personnelReport.addAll(ship.getCrewMembers());
         }
-
+        System.out.println("[HUB] Personnel report:");
         System.out.println(personnelReport);
     }
 
@@ -266,7 +266,7 @@ public class HubService {
 
         // I may want to decouple the invoice logic from the calculation of the docking fee
         // Generate Invoice
-        System.out.printf("[HUB-BILLING] Invoice for (%s)'%s' :%n", dockedShip.getName(), dockedShip.getClass().getSimpleName());
+        System.out.printf("[HUB-BILLING] Invoice for (%s)'%s' :%n", dockedShip.getClass().getSimpleName(), dockedShip.getName());
         System.out.printf("----> Base Fee: %.2f%n", baseFee);
         System.out.printf("----> Fuel Added: %d units | Repairs: %d units%n", fuelNeeded, repairsNeeded);
         System.out.printf("----> Total Charged: %.2f credits%n", shipTotalBill);
@@ -303,13 +303,13 @@ public class HubService {
 
     // Uses a string filter. I haven't decided yet how the user will interact with this.
     // 'all time' to search through registeredShips; 'docked' to search through the currently docked ships
-    public void findHeaviestCargoShip(String filter) {
+    public Optional<CargoShip> findHeaviestCargoShip(String filter) {
         Optional<CargoShip> heaviestShip;
 
         if (filter.equalsIgnoreCase("all time")) {
             if (registeredShips.isEmpty()) {
                 System.out.println("[HUB] No ships have been registered yet.");
-                return;
+                return Optional.empty();
             }
 
             heaviestShip = registeredShips.stream()
@@ -320,7 +320,7 @@ public class HubService {
         } else if (filter.equalsIgnoreCase("docked")) {
             if (dockingBays.isEmpty()) {
                 System.out.println("[HUB] No docking bays exist.");
-                return;
+                return Optional.empty();
             }
 
             heaviestShip = dockingBays.values().stream()
@@ -331,7 +331,7 @@ public class HubService {
                     .max(Comparator.comparingDouble(this::calculateCargoWeight));
         } else {
             System.out.println("[HUB] Error: Invalid filter. Use 'all time' or 'docked'.");
-            return;
+            return Optional.empty();
         }
 
         heaviestShip.ifPresentOrElse(
@@ -339,6 +339,7 @@ public class HubService {
                         filter.toLowerCase(), ship.getName(), calculateCargoWeight(ship)),
                 () -> System.out.println("[HUB] No cargo ships found matching the '" + filter + "' filter.")
         );
+        return heaviestShip;
     }
 
     public List<DockingBay> getBaysByStatus(boolean occupied) {
@@ -387,6 +388,6 @@ public class HubService {
 
         dockingBays.values().forEach(DockingBay::undockSpaceShip);
 
-        System.out.printf("[HUB] EMERGENCY OVERRIDE: Successfully evacuated %d personnel", totalEvacuated);
+        System.out.printf("[HUB] EMERGENCY OVERRIDE: Successfully evacuated %d personnel%n", totalEvacuated);
     }
 }
