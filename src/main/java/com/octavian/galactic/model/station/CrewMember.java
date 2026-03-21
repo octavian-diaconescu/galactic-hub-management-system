@@ -5,7 +5,7 @@ import com.octavian.galactic.model.SpaceEntity;
 import java.util.Objects;
 
 public class CrewMember extends SpaceEntity implements Comparable<CrewMember> {
-    private String species;
+    private final Species species;
     private final Rank rank;
 
     public enum Rank {
@@ -17,10 +17,22 @@ public class CrewMember extends SpaceEntity implements Comparable<CrewMember> {
         GUEST         // Temporary visitors
     }
 
+    public enum Species{
+        Human,
+        Gek,
+        Korvax,
+        Vykeen,
+        Atlas
+    }
 
-    public CrewMember(String name, Rank rank) {
+    public CrewMember(String name, Rank rank, Species species) {
         super(name);
         this.rank = Objects.requireNonNull(rank, "Rank cannot be null");
+        this.species = species;
+    }
+
+    public Species getSpecies() {
+        return species;
     }
 
     @Override

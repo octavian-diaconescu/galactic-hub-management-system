@@ -20,13 +20,12 @@ public class DockingBayTest {
     @DisplayName("Should create a docking bay, and add a ship. The ship should have crew and cargo ")
     void addShipToDockingBaySuccess() {
         // Arrange
-        DockingBay derelictFreighter = new DockingBay("Mariana Trench", Size.MEDIUM, false);
         CargoShip titanHauler = new CargoShip("Titan Hauler", Size.MEDIUM, 85, 90, 5, 100.88);
 
         List<CrewMember> crewManifest = List.of(
-                new CrewMember("Michael Bay", CrewMember.Rank.COMMANDER),
-                new CrewMember("Leonardo DiCaprio", CrewMember.Rank.GUEST),
-                new CrewMember("Matthew McConaughey", CrewMember.Rank.ENGINEER)
+                new CrewMember("Michael Bay", CrewMember.Rank.COMMANDER, CrewMember.Species.Gek),
+                new CrewMember("Leonardo DiCaprio", CrewMember.Rank.GUEST, CrewMember.Species.Human),
+                new CrewMember("Matthew McConaughey", CrewMember.Rank.ENGINEER, CrewMember.Species.Atlas)
         );
         Map<CargoItem, Integer> cargoManifest = new LinkedHashMap<>(Map.of(
                 new HazardousCargo("Antimatter jelly", 5, 0, "Regular", "A mysterious jelly extracted from unknown sources"), 1,
@@ -45,7 +44,5 @@ public class DockingBayTest {
         for (CargoItem ci : cargoManifest.keySet()) {
             assertTrue(titanHauler.getCargoManifest().containsKey(ci));
         }
-        System.out.println(titanHauler.getCargoManifest());
-        System.out.println(titanHauler.getCrewMembers());
     }
 }

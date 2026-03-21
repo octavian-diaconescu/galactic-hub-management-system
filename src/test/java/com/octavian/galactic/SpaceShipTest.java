@@ -23,8 +23,8 @@ public class SpaceShipTest {
     void testAddCrewMemberSuccess() {
         // Arrange
         CargoShip ship = new CargoShip("Alpha 1", Size.LARGE, 100, 2, 5, 1000.0);
-        CrewMember bob = new CrewMember("Bob", CrewMember.Rank.COMMANDER);
-        CrewMember michael = new CrewMember("Michael", CrewMember.Rank.COMMANDER);
+        CrewMember bob = new CrewMember("Bob", CrewMember.Rank.COMMANDER, CrewMember.Species.Human);
+        CrewMember michael = new CrewMember("Michael", CrewMember.Rank.COMMANDER, CrewMember.Species.Human);
 
         // Act
         ship.addCrewMember(michael);
@@ -42,8 +42,8 @@ public class SpaceShipTest {
     void testAddCrewMemberFail(){
         // Arrange
         CargoShip ship = new CargoShip("Venus", Size.SMALL, 57, 95, 1, 25.50);
-        CrewMember NPC = new CrewMember("John Doe", CrewMember.Rank.CIVILIAN);
-        CrewMember NPC2 = new CrewMember("Jason Statham", CrewMember.Rank.COMMANDER);
+        CrewMember NPC = new CrewMember("John Doe", CrewMember.Rank.CIVILIAN, CrewMember.Species.Vykeen);
+        CrewMember NPC2 = new CrewMember("Jason Statham", CrewMember.Rank.COMMANDER, CrewMember.Species.Vykeen);
 
         // Act
         ship.addCrewMember(NPC);

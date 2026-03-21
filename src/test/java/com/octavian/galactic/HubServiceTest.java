@@ -43,23 +43,23 @@ public class HubServiceTest {
 
         dockingBay = new DockingBay("Earth-Dock-1", Size.LARGE, false);
         dockingBay2 = new DockingBay("Earth-Dock-2", Size.LARGE, false);
-        dockingBay3 = new DockingBay("Earth-Dock-1", Size.LARGE, false);
+        dockingBay3 = new DockingBay("Earth-Dock-3", Size.LARGE, false);
 
         spaceShip = new ScoutShip("TARS", Size.MEDIUM, 100, 100, 10, 200);
         cargoShip = new CargoShip("RATS", Size.SMALL, 50, 80, 3, 5000);
         cargoShip1 = new CargoShip("Alpha 1", Size.SMALL, 88, 100, 20, 25.75);
         scoutShip = new ScoutShip("Alpha 1", Size.LARGE, 90, 90, 5, 10);
 
-        guestCrewMember = new CrewMember("Michael Bay", CrewMember.Rank.GUEST);
+        guestCrewMember = new CrewMember("Michael Bay", CrewMember.Rank.GUEST, CrewMember.Species.Korvax);
         scoutShipCrewMembers = Set.of(
-                new CrewMember("John Doe", CrewMember.Rank.COMMANDER),
-                new CrewMember("Mark Twain", CrewMember.Rank.GUEST),
-                new CrewMember("John Cena", CrewMember.Rank.SPECIALIST),
-                new CrewMember("Clark Kent", CrewMember.Rank.ENGINEER)
+                new CrewMember("John Doe", CrewMember.Rank.COMMANDER, CrewMember.Species.Human),
+                new CrewMember("Mark Twain", CrewMember.Rank.GUEST, CrewMember.Species.Human),
+                new CrewMember("John Cena", CrewMember.Rank.SPECIALIST, CrewMember.Species.Vykeen),
+                new CrewMember("Clark Kent", CrewMember.Rank.ENGINEER, CrewMember.Species.Atlas)
         );
        cargoShipCrewMembers = Set.of(
-                new CrewMember("John Doe", CrewMember.Rank.COMMANDER),
-                new CrewMember("Matthew Murdock", CrewMember.Rank.SPECIALIST)
+                new CrewMember("John Doe", CrewMember.Rank.COMMANDER, CrewMember.Species.Korvax),
+                new CrewMember("Matthew Murdock", CrewMember.Rank.SPECIALIST, CrewMember.Species.Atlas)
         );
 
         hc = new HazardousCargo("Radioactive milk", 2.5, 8, "Lead-lined");
@@ -211,7 +211,6 @@ public class HubServiceTest {
     @DisplayName("Should undock all ships during an emergency evacuation")
     void testEmergencyEvacuation() {
         // Arrange
-        // Give the ship a crew member, build a bay, and dock the ship so there is someone to evacuate
         cargoShip.addCrewMember(guestCrewMember);
         hubService.buildDockingBay(dockingBay);
         hubService.registerShip(cargoShip);
