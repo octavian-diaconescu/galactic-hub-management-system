@@ -33,6 +33,7 @@ public class CargoTest {
 
         hazardousCargoWithDescription.printItemInfo();
         hazardousCargoWithDescription2.printItemInfo();
+        hc.printItemInfo();
 
         cargoShip.printCargoManifest();
 

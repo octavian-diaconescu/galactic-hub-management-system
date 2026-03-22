@@ -2,6 +2,8 @@ package com.octavian.galactic.model.cargo;
 
 import com.octavian.galactic.model.SpaceEntity;
 
+//TODO: implement builder pattern
+
 // A CargoItem derived object describes a type of cargo a cargo ship can hold
 public abstract class CargoItem extends SpaceEntity {
     private final double weight;

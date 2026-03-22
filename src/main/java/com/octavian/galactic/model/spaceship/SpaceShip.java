@@ -10,6 +10,8 @@ import java.util.TreeSet;
 import java.util.Collections;
 import java.util.UUID;
 
+//TODO: implement builder pattern
+
 // The base for all flying vehicles
 public abstract class SpaceShip extends SpaceEntity implements Fuellable {
     private int fuelLevel; // 0 to 100 reinforced in the setter function
