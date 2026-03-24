@@ -86,7 +86,7 @@ public class HubService {
                 .ifPresentOrElse(
                         ship -> {
                             if (bay.isOccupied()) {
-                                System.out.println("[HUB] Error: Docking Bay " + bayNumber + " is already occupied by" + ship.getName());
+                                System.out.println("[HUB] Error: Docking Bay " + bayNumber + " is already occupied by " + ship.getName());
 
                             } else if (ship.getShipSize().compareTo(bay.getBaySize()) <= 0) {
                                 bay.dockSpaceShip(ship);
