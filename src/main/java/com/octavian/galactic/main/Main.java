@@ -1,5 +1,6 @@
 package com.octavian.galactic.main;
 
+import com.octavian.galactic.exception.InsufficientContainmentException;
 import com.octavian.galactic.model.Size;
 import com.octavian.galactic.model.cargo.HazardousCargo;
 import com.octavian.galactic.model.spaceship.CargoShip;
@@ -34,7 +35,11 @@ public class Main {
         // Create Ships (with missing fuel/hull for billing demonstration)
         CargoShip freighter = new CargoShip("USG Ishimura", Size.LARGE, 40, 60, 10, 50000);
         freighter.addCrewMember(new CrewMember("Isaac Clarke", CrewMember.Rank.ENGINEER, CrewMember.Species.HUMAN));
-        freighter.addCargoItem(new HazardousCargo("Marker Fragment", 50.0, 100, "Stasis Field", "Highly volatile alien artifact"), 1);
+        try {
+            freighter.addCargoItem(new HazardousCargo("Marker Fragment", 50.0, 100, "Stasis Field", "Highly volatile alien artifact"), 1);
+        } catch (InsufficientContainmentException i){
+            System.out.println(i.getMessage());
+        }
 
         ScoutShip fighter = new ScoutShip("Swordfish II", Size.SMALL, 80, 95, 2, 500);
         fighter.addCrewMember(new CrewMember("Spike Spiegel", CrewMember.Rank.COMMANDER, CrewMember.Species.HUMAN));

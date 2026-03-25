@@ -1,5 +1,6 @@
 package com.octavian.galactic.model.spaceship;
 
+import com.octavian.galactic.exception.CrewCapacityExceededException;
 import com.octavian.galactic.model.Fuellable;
 import com.octavian.galactic.model.SpaceEntity;
 import com.octavian.galactic.model.station.CrewMember;
@@ -70,8 +71,7 @@ public abstract class SpaceShip extends SpaceEntity implements Fuellable {
         }
         // Check for capacity constraints
         if (crewMembers.size() + 1 > maxCrewCapacity) {
-            System.out.printf("[MANIFEST] (%s)'%s' is at max crew capacity%n", this.getClass().getSimpleName(), this.getName());
-            return;
+            throw new CrewCapacityExceededException(this.name, this.maxCrewCapacity);
         }
         // Finally, add the crew member
         if (this.crewMembers.add(crew)) {

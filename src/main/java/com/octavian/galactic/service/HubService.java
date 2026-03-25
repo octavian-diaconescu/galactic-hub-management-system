@@ -1,5 +1,7 @@
 package com.octavian.galactic.service;
 
+import com.octavian.galactic.exception.DockingBayNotFoundException;
+import com.octavian.galactic.exception.ShipNotFoundException;
 import com.octavian.galactic.model.cargo.*;
 import com.octavian.galactic.model.spaceship.*;
 import com.octavian.galactic.model.station.*;
@@ -58,7 +60,9 @@ public class HubService {
                         System.out.println("[HUB] Successfully removed bay: " + entry.getValue().getName());
                     }
                 },
-                () -> System.out.println("[HUB] Error: Didn't find bay with ID ==>" + id.toString().substring(0, 8))
+                () -> {
+                    throw new DockingBayNotFoundException(id);
+                }
         );
     }
 
@@ -76,8 +80,7 @@ public class HubService {
     public void assignShipToBay(UUID id, int bayNumber) {
         DockingBay bay = dockingBays.get(bayNumber);
         if (bay == null) {
-            System.out.println("[HUB] Error: Docking Bay " + bayNumber + " does not exist");
-            return;
+            throw new DockingBayNotFoundException(bayNumber);
         }
 
         registeredShips.stream()
@@ -89,13 +92,16 @@ public class HubService {
                                 System.out.println("[HUB] Error: Docking Bay " + bayNumber + " is already occupied by " + ship.getName());
 
                             } else if (ship.getShipSize().compareTo(bay.getBaySize()) <= 0) {
+                                // Size validation is enforced by the bay itself through the dockSpaceShip method
                                 bay.dockSpaceShip(ship);
                                 System.out.printf("[HUB] Success: '%s' parked in bay %d%n", ship.getName(), bayNumber);
                             } else {
                                 System.out.printf("[HUB] Error: Ship '%s' is too large for bay %d%n", ship.getName(), bayNumber);
                             }
                         },
-                        () -> System.out.println("[HUB] Error: No registered ship found with ID " + id.toString().substring(0, 8))
+                        () -> {
+                            throw new ShipNotFoundException(id);
+                        }
                 );
     }
 
@@ -111,7 +117,9 @@ public class HubService {
                 .findFirst()
                 .ifPresentOrElse(
                         bayEntry -> bayEntry.getValue().undockSpaceShip(),
-                        () -> System.out.println("[HUB] Error: Ship (" + id.toString().substring(0, 8) + ") does not exist")
+                        () -> {
+                            throw new ShipNotFoundException(id);
+                        }
                 );
     }
 
@@ -127,7 +135,11 @@ public class HubService {
                 .findFirst()
                 .ifPresentOrElse(entry ->
                                 entry.getValue().getSpaceShip().addCrewMember(crew),
-                        () -> System.out.println("[HUB] Error: Ship (" + id + ") not found")
+                        () -> {
+                            throw new ShipNotFoundException(
+                                    "Ship (" + id.toString().substring(0, 8) + ") is not docked — cannot board crew"
+                            );
+                        }
                 );
     }
 
@@ -140,9 +152,11 @@ public class HubService {
                 .stream()
                 .filter(entry -> entry.getValue().isOccupied() && entry.getValue().getSpaceShip().getId().equals(toShipId))
                 .findFirst();
-        if (fromShipDock.isEmpty() || toShipDock.isEmpty()) {
-            System.out.println("[HUB] Error: Could not locate both ships in the docking bays.");
-            return;
+        if (fromShipDock.isEmpty()) {
+            throw new ShipNotFoundException("Source ship (" + fromShipId.toString().substring(0, 8) + ") is not docked");
+        }
+        if (toShipDock.isEmpty()) {
+            throw new ShipNotFoundException("Destination ship (" + toShipId.toString().substring(0, 8) + ") is not docked");
         }
 
         SpaceShip sourceShip = fromShipDock.get().getValue().getSpaceShip();
@@ -158,7 +172,9 @@ public class HubService {
                     System.out.printf("[HUB] Success: Transferred %s from '%s' to '%s'.%n",
                             crew.getName(), sourceShip.getName(), destinationShip.getName());
                 },
-                () -> System.out.println("[HUB] Error: Crew ID (" + crewId.toString().substring(0, 8) + ") wasn't found on the source ship.")
+                () -> {
+                    throw new IllegalStateException("Crew member (" + crewId.toString().substring(0, 8) + ") not found on '" + sourceShip.getName() + "'");
+                }
         );
     }
 
@@ -174,8 +190,7 @@ public class HubService {
                 .filter(entry -> entry.getValue().getSpaceShip().getId().equals(shipId))
                 .findFirst();
         if (targetBay.isEmpty()) {
-            System.out.println("[HUB] Cannot find the ship in any of the currently occupied bays.");
-            return false;
+            throw new ShipNotFoundException("Ship (" + shipId.toString().substring(0, 8) + ") is not docked — cannot scan");
         }
 
         SpaceShip targetShip = targetBay.get().getValue().getSpaceShip();
@@ -229,8 +244,7 @@ public class HubService {
                 .map(DockingBay::getSpaceShip)
                 .findFirst();
         if (ship.isEmpty()) {
-            System.out.println("[HUB] Couldn't locate ship with id: " + shipId.toString().substring(0, 8));
-            return -1.0;
+            throw new ShipNotFoundException("[HUB] Couldn't locate ship with id: " + shipId.toString().substring(0, 8));
         }
         SpaceShip dockedShip = ship.get();
 
@@ -239,21 +253,28 @@ public class HubService {
 
         double resourceCost = (fuelNeeded * FUEL_COST_PER_UNIT) + (repairsNeeded * REPAIR_COST_PER_UNIT);
 
-        double baseFee = 0.0;
-        double serviceMultiplier = 1.0; // Standard labor rate
+        double baseFee;
+        double serviceMultiplier; // Standard labor rate
 
-        if (dockedShip instanceof CargoShip) {
-            baseFee = 500.0; // Heavy-duty docking fee
-            serviceMultiplier = 1.5; // Commercial surcharge for parts and labor
-        } else if (dockedShip instanceof ScoutShip) {
-            baseFee = 100.0; // Standard light docking fee
+        switch (dockedShip) {
+            case CargoShip _ -> {
+                baseFee = 500.0; // Heavy-duty docking fee
+
+                serviceMultiplier = 1.5; // Commercial surcharge for parts and labor
+            }
+            case ScoutShip _ ->{
+                baseFee = 100.0;
+                serviceMultiplier = 1.0;
+            } // Standard light docking fee
+            case FighterShip _ -> {
+                baseFee = 200;
+                serviceMultiplier = 1.2;
+            }
+            default ->
+                    throw new IllegalArgumentException("Unknown ship type '" + ship.getClass().getSimpleName() + "' — no billing rate defined");
         }
 
         // Calculate final bill for this ship
-        if (baseFee == 0) {
-            System.out.println("[HUB] Error: Couldn't identify ship type.");
-            return -2.0;
-        }
         double shipTotalBill = baseFee + (resourceCost * serviceMultiplier);
 
         // Perform the maintenance (State Change)
@@ -339,30 +360,16 @@ public class HubService {
     }
 
     public List<DockingBay> getBaysByStatus(boolean occupied) {
-        List<DockingBay> filteredBays; // Unmodifiable by the toList() terminal operation
+        List<DockingBay> filteredBays; // Unmodifiable because of the toList() terminal operation
+        filteredBays = dockingBays.values().stream()
+                .filter(bay -> bay.isOccupied() == occupied)
+                .toList();
 
-        if (occupied) {
-            filteredBays = dockingBays.values()
-                    .stream()
-                    .filter(DockingBay::isOccupied)
-                    .toList();
-
-            if (filteredBays.isEmpty()) {
-                System.out.println("[HUB] No docking bays are currently occupied.");
-                return new ArrayList<>();
-            }
-        } else {
-            filteredBays = dockingBays.values()
-                    .stream()
-                    .filter(dock -> !dock.isOccupied())
-                    .toList();
-
-            if (filteredBays.isEmpty()) {
-                System.out.println("[HUB] All docking bays are full.");
-                return new ArrayList<>();
-            }
+        if (filteredBays.isEmpty()) {
+            System.out.println(occupied ? "[HUB] No docking bays are currently occupied." : "[HUB] All docking bays are full.");
         }
-        return filteredBays;
+
+        return filteredBays.isEmpty() ? new ArrayList<>() : filteredBays;
     }
 
     public void emergencyEvacuation() {
@@ -382,7 +389,9 @@ public class HubService {
             return;
         }
 
-        dockingBays.values().forEach(DockingBay::undockSpaceShip);
+        dockingBays.values().stream()
+                .filter(DockingBay::isOccupied)
+                .forEach(DockingBay::undockSpaceShip);
 
         System.out.printf("[HUB] EMERGENCY OVERRIDE: Successfully evacuated %d personnel%n", totalEvacuated);
     }

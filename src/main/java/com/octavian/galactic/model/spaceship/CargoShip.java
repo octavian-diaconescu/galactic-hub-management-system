@@ -1,5 +1,7 @@
 package com.octavian.galactic.model.spaceship;
 
+import com.octavian.galactic.exception.CargoCapacityExceededException;
+import com.octavian.galactic.exception.InsufficientContainmentException;
 import com.octavian.galactic.model.Size;
 import com.octavian.galactic.model.cargo.CargoItem;
 import com.octavian.galactic.model.cargo.HazardousCargo;
@@ -34,14 +36,14 @@ public class CargoShip extends SpaceShip {
                 .sum();
 
         if (currentWeight + item.getWeight() * quantity > maxCargoWeight) {
-            System.out.printf("[LOGISTICS] Cannot add [%d] x '%s' due to weight constraints%n", quantity, item.getName());
-            return;
+            double overBy = (currentWeight + item.getWeight() * quantity) - maxCargoWeight;
+            throw new CargoCapacityExceededException(this.getName(), item.getName(), quantity, overBy);
         }
         if(item instanceof HazardousCargo){
             System.out.println(((HazardousCargo) item).getHandlingWarning() + "-->" + item.getName());
 
             if(!((HazardousCargo) item).isContainmentAdequate()){
-                return;
+                throw new InsufficientContainmentException(item.getName(), ((HazardousCargo) item).getContainmentType());
             }
         }
         cargoManifest.put(item, cargoManifest.getOrDefault(item, 0) + quantity);

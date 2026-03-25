@@ -19,6 +19,10 @@ public class HazardousCargo extends CargoItem {
 
     }
 
+    public String getContainmentType() {
+        return containmentType;
+    }
+
     public void setRadiationLevel(int radiationLevel) {
         if (radiationLevel < 0) {
             throw new IllegalArgumentException("Radiation level cannot be less than 0");
