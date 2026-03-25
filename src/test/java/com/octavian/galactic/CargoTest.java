@@ -16,7 +16,13 @@ public class CargoTest {
     @DisplayName("Should add two cargo items to a cargo ship")
     void testAddCargoToCargoShip() {
         // Arrange
-        CargoShip cargoShip = new CargoShip("Alpha 1", Size.SMALL, 88, 100, 20, 25.75);
+        CargoShip cargoShip = new CargoShip.Builder("Alpha 1", Size.SMALL)
+                .fuelLevel(88)
+                .hullIntegrity(100)
+                .maxCrewCapacity(20)
+                .maxCargoWeight(25.75)
+                .build();
+
         HazardousCargo hc = new HazardousCargo("Radioactive milk", 2.5, 8, "Lead-lined");
         HazardousCargo hazardousCargoWithDescription = new HazardousCargo("Antimatter jelly", 5, 0, "Regular",
                 "A mysterious jelly extracted from unknown sources");
@@ -44,7 +50,13 @@ public class CargoTest {
     @DisplayName("Should throw CargoCapacityExceededException when adding cargo over maxCargoWeight")
     void testAddCargoOverWeightLimit() {
         // Arrange
-        CargoShip ship = new CargoShip("HeavyHauler", Size.SMALL, 12, 100, 5, 2.5);
+        CargoShip ship = new CargoShip.Builder("HeavyHauler", Size.SMALL)
+                .fuelLevel(12)
+                .hullIntegrity(100)
+                .maxCrewCapacity(5)
+                .maxCargoWeight(2.5)
+                .build();
+
         HazardousCargo hc = new HazardousCargo("Lead balls", 1, 0, "Regular");
 
         // Act
@@ -64,7 +76,12 @@ public class CargoTest {
     @DisplayName("Should throw InsufficientContainmentException for high-radiation cargo with inadequate containment")
     void testAddHazardousCargoWithBadContainment() {
         // Arrange
-        CargoShip ship = new CargoShip("Transport", Size.MEDIUM, 100, 100, 5, 500.0);
+        CargoShip ship = new CargoShip.Builder("Transport", Size.MEDIUM)
+                .fuelLevel(100)
+                .hullIntegrity(100)
+                .maxCrewCapacity(5)
+                .maxCargoWeight(500.0)
+                .build();
         // Radiation level 8 (>= 7 threshold) with non-Lead-lined containment → rejected
         HazardousCargo dangerousCargo = new HazardousCargo("Unstable isotope", 10, 8, "Plastic wrap");
 

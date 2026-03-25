@@ -22,12 +22,44 @@ public abstract class SpaceShip extends SpaceEntity implements Fuellable {
 
     private final Set<CrewMember> crewMembers = new TreeSet<>();
 
-    public SpaceShip(String name, int fuelLevel, int hullIntegrity, int maxCrewCapacity, Size shipSize) {
-        super(name);
-        setFuelLevel(fuelLevel);
-        setHullIntegrity(hullIntegrity);
-        this.maxCrewCapacity = maxCrewCapacity;
-        this.shipSize = shipSize;
+    protected SpaceShip(AbstractBuilder<?> builder){
+        super(builder.name);
+        setFuelLevel(builder.fuelLevel);
+        setHullIntegrity(builder.hullIntegrity);
+        this.maxCrewCapacity = builder.maxCrewCapacity;
+        this.shipSize = builder.shipSize;
+
+    }
+
+    public abstract static class AbstractBuilder<T extends AbstractBuilder<T>>{
+        private final String name;
+        private final Size shipSize;
+        private int fuelLevel = 100;
+        private int hullIntegrity = 100;
+        private int maxCrewCapacity = 5;
+
+        public AbstractBuilder(String name, Size shipSize){
+            this.name = name;
+            this.shipSize = shipSize;
+        }
+
+        public T fuelLevel(int fuelLevel){
+            this.fuelLevel = fuelLevel;
+            return self();
+        }
+
+        public T hullIntegrity(int hullIntegrity){
+            this.hullIntegrity = hullIntegrity;
+            return self();
+        }
+
+        public T maxCrewCapacity(int maxCrewCapacity){
+            this.maxCrewCapacity = maxCrewCapacity;
+            return self();
+        }
+
+        protected abstract T self();
+        public abstract SpaceShip build();
     }
 
     public Size getShipSize() {

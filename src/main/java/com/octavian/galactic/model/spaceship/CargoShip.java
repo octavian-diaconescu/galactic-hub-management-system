@@ -16,14 +16,38 @@ public class CargoShip extends SpaceShip {
     private final Map<CargoItem, Integer> cargoManifest = new LinkedHashMap<>();
 
 
-    public CargoShip(String name, Size size, int fuelLevel, int hullIntegrity, int maxCrewCapacity, double maxCargoCapacity) {
-        super(name, fuelLevel, hullIntegrity, maxCrewCapacity, size);
-        if (maxCargoCapacity < 0) {
+    private CargoShip(Builder builder) {
+        super(builder);
+        if (builder.maxCargoWeight < 0) {
             throw new IllegalArgumentException("Max cargo weight cannot be less than 0!");
         }
-        this.maxCargoWeight = maxCargoCapacity;
+        this.maxCargoWeight = builder.maxCargoWeight;
     }
 
+    public static class Builder extends AbstractBuilder<Builder>{
+        private double maxCargoWeight = 0.0;
+
+        public Builder(String name, Size size){
+            super(name, size);
+        }
+
+        public Builder maxCargoWeight(double maxCargoWeight){
+            this.maxCargoWeight = maxCargoWeight;
+            return this;
+        }
+
+        @Override
+        public Builder self(){
+            return this;
+        }
+
+        @Override
+        public CargoShip build() {
+            return new CargoShip(this);
+        }
+
+
+    }
     public void addCargoItem(CargoItem item, int quantity) {
         if (item == null || quantity <= 0) {
             System.out.println("[LOGISTICS] Cannot insert a null item or with a quantity of 0!");

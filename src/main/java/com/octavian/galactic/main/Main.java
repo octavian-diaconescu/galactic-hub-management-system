@@ -33,15 +33,25 @@ public class Main {
         hub.buildDockingBay(new DockingBay("Heavy-Hauler-Large", Size.LARGE, false));
 
         // Create Ships (with missing fuel/hull for billing demonstration)
-        CargoShip freighter = new CargoShip("USG Ishimura", Size.LARGE, 40, 60, 10, 50000);
+        CargoShip freighter = new CargoShip.Builder("USG Ishimura", Size.LARGE)
+                .fuelLevel(40)
+                .hullIntegrity(60)
+                .maxCrewCapacity(10)
+                .maxCargoWeight(50000)
+                .build();
         freighter.addCrewMember(new CrewMember("Isaac Clarke", CrewMember.Rank.ENGINEER, CrewMember.Species.HUMAN));
         try {
-            freighter.addCargoItem(new HazardousCargo("Marker Fragment", 50.0, 100, "Stasis Field", "Highly volatile alien artifact"), 1);
-        } catch (InsufficientContainmentException i){
+            freighter.addCargoItem(new HazardousCargo("Marker Fragment", 50.0, 100, "Lead-lined", "Highly volatile alien artifact"), 1);
+        } catch (InsufficientContainmentException i) {
             System.out.println(i.getMessage());
         }
 
-        ScoutShip fighter = new ScoutShip("Swordfish II", Size.SMALL, 80, 95, 2, 500);
+        ScoutShip fighter = new ScoutShip.Builder("Swordfish II", Size.SMALL)
+                .fuelLevel(80)
+                .hullIntegrity(95)
+                .maxCrewCapacity(2)
+                .sensorRange(500)
+                .build();
         fighter.addCrewMember(new CrewMember("Spike Spiegel", CrewMember.Rank.COMMANDER, CrewMember.Species.HUMAN));
 
         // Register Ships

@@ -37,7 +37,7 @@ public class HubServiceTest {
     private Set<CrewMember> cargoShipCrewMembers;
 
     @BeforeEach
-    void setUp(){
+    void setUp() {
         mainHub = new HubService("MAIN HUB");
         hubService = new HubService("HUB ALPHA");
 
@@ -45,10 +45,32 @@ public class HubServiceTest {
         dockingBay2 = new DockingBay("Earth-Dock-2", Size.LARGE, false);
         dockingBay3 = new DockingBay("Earth-Dock-3", Size.LARGE, false);
 
-        spaceShip = new ScoutShip("TARS", Size.MEDIUM, 100, 100, 10, 200);
-        cargoShip = new CargoShip("RATS", Size.SMALL, 50, 80, 3, 5000);
-        cargoShip1 = new CargoShip("Alpha 1", Size.SMALL, 88, 100, 20, 25.75);
-        scoutShip = new ScoutShip("Alpha 1", Size.LARGE, 90, 90, 5, 10);
+        spaceShip = new ScoutShip.Builder("TARS", Size.MEDIUM)
+                .fuelLevel(100)
+                .hullIntegrity(100)
+                .maxCrewCapacity(10)
+                .sensorRange(200)
+                .build();
+
+        cargoShip = new CargoShip.Builder("RATS", Size.SMALL)
+                .fuelLevel(50)
+                .hullIntegrity(80)
+                .maxCrewCapacity(3)
+                .maxCargoWeight(5000)
+                .build();
+        cargoShip1 = new CargoShip.Builder("Alpha 1", Size.SMALL)
+                .fuelLevel(88)
+                .hullIntegrity(100)
+                .maxCrewCapacity(20)
+                .maxCargoWeight(25.75)
+                .build();
+
+        scoutShip = new ScoutShip.Builder("Alpha 1", Size.LARGE)
+                .fuelLevel(90)
+                .hullIntegrity(90)
+                .maxCrewCapacity(5)
+                .sensorRange(10)
+                .build();
 
         guestCrewMember = new CrewMember("Michael Bay", CrewMember.Rank.GUEST, CrewMember.Species.KORVAX);
         scoutShipCrewMembers = Set.of(
@@ -57,7 +79,7 @@ public class HubServiceTest {
                 new CrewMember("John Cena", CrewMember.Rank.SPECIALIST, CrewMember.Species.VYKEEN),
                 new CrewMember("Clark Kent", CrewMember.Rank.ENGINEER, CrewMember.Species.ATLAS)
         );
-       cargoShipCrewMembers = Set.of(
+        cargoShipCrewMembers = Set.of(
                 new CrewMember("John Doe", CrewMember.Rank.COMMANDER, CrewMember.Species.KORVAX),
                 new CrewMember("Matthew Murdock", CrewMember.Rank.SPECIALIST, CrewMember.Species.ATLAS)
         );

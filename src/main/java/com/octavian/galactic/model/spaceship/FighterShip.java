@@ -16,14 +16,54 @@ public class FighterShip extends SpaceShip {
     private int ammunitionCount;
     private boolean weaponsArmed;
 
-    public FighterShip(String name, int fuelLevel, int hullIntegrity, int maxCrewCapacity, Size shipSize, WeaponClass primaryWeapon, int shieldStrength, int ammunitionCount) {
-        super(name, fuelLevel, hullIntegrity, maxCrewCapacity, shipSize);
-        this.primaryWeapon = primaryWeapon;
-        setShieldStrength(shieldStrength);
-        setAmmunitionCount(ammunitionCount);
-        this.weaponsArmed = false;
+    private FighterShip(Builder builder) {
+        super(builder);
+        this.primaryWeapon = builder.primaryWeapon;
+        setShieldStrength(builder.shieldStrength);
+        setAmmunitionCount(builder.ammunitionCount);
+        this.weaponsArmed = builder.weaponsArmed;
     }
 
+    public static class Builder extends AbstractBuilder<Builder> {
+        private WeaponClass primaryWeapon = WeaponClass.LASER;
+        private int shieldStrength = 100;
+        private int ammunitionCount = 25;
+        private boolean weaponsArmed = false;
+
+        public Builder(String name, Size size) {
+            super(name, size);
+        }
+
+        public Builder primaryWeapon(WeaponClass primaryWeapon){
+            this.primaryWeapon = primaryWeapon;
+            return this;
+        }
+
+        public Builder shieldStrength(int shieldStrength){
+            this.shieldStrength = shieldStrength;
+            return this;
+        }
+
+        public Builder ammunitionCount(int ammunitionCount){
+            this.ammunitionCount = ammunitionCount;
+            return this;
+        }
+
+        public Builder weaponsArmed(boolean weaponsArmed){
+            this.weaponsArmed = weaponsArmed;
+            return this;
+        }
+
+        @Override
+        public Builder self() {
+            return this;
+        }
+
+        @Override
+        public FighterShip build() {
+            return new FighterShip(this);
+        }
+    }
     public void armWeapons() {
         if (weaponsArmed) {
             System.out.printf("[COMBAT] '%s' weapons' are already armed.%n", this.getName());

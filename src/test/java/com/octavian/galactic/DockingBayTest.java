@@ -20,7 +20,12 @@ public class DockingBayTest {
     @DisplayName("Should create a docking bay, and add a ship. The ship should have crew and cargo ")
     void addShipToDockingBaySuccess() {
         // Arrange
-        CargoShip titanHauler = new CargoShip("Titan Hauler", Size.MEDIUM, 85, 90, 5, 100.88);
+        CargoShip titanHauler = new CargoShip.Builder("Titan Hauler", Size.MEDIUM)
+                .fuelLevel(85)
+                .hullIntegrity(90)
+                .maxCrewCapacity(5)
+                .maxCargoWeight(100.88)
+                .build();
 
         List<CrewMember> crewManifest = List.of(
                 new CrewMember("Michael Bay", CrewMember.Rank.COMMANDER, CrewMember.Species.GEK),
