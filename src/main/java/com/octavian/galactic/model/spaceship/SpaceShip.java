@@ -22,43 +22,47 @@ public abstract class SpaceShip extends SpaceEntity implements Fuellable {
 
     private final Set<CrewMember> crewMembers = new TreeSet<>();
 
-    protected SpaceShip(AbstractBuilder<?> builder){
+    protected SpaceShip(AbstractBuilder<?> builder) {
         super(builder.name);
         setFuelLevel(builder.fuelLevel);
         setHullIntegrity(builder.hullIntegrity);
+        if (builder.maxCrewCapacity <= 0) {
+            throw new IllegalArgumentException("maxCrewCapacity must be greater than 0");
+        }
         this.maxCrewCapacity = builder.maxCrewCapacity;
         this.shipSize = builder.shipSize;
 
     }
 
-    public abstract static class AbstractBuilder<T extends AbstractBuilder<T>>{
+    public abstract static class AbstractBuilder<T extends AbstractBuilder<T>> {
         private final String name;
         private final Size shipSize;
         private int fuelLevel = 100;
         private int hullIntegrity = 100;
         private int maxCrewCapacity = 5;
 
-        public AbstractBuilder(String name, Size shipSize){
+        public AbstractBuilder(String name, Size shipSize) {
             this.name = name;
             this.shipSize = shipSize;
         }
 
-        public T fuelLevel(int fuelLevel){
+        public T fuelLevel(int fuelLevel) {
             this.fuelLevel = fuelLevel;
             return self();
         }
 
-        public T hullIntegrity(int hullIntegrity){
+        public T hullIntegrity(int hullIntegrity) {
             this.hullIntegrity = hullIntegrity;
             return self();
         }
 
-        public T maxCrewCapacity(int maxCrewCapacity){
+        public T maxCrewCapacity(int maxCrewCapacity) {
             this.maxCrewCapacity = maxCrewCapacity;
             return self();
         }
 
         protected abstract T self();
+
         public abstract SpaceShip build();
     }
 
@@ -77,12 +81,14 @@ public abstract class SpaceShip extends SpaceEntity implements Fuellable {
     public int getFuelLevel() {
         return fuelLevel;
     }
+
     @Override
-    public boolean fuelTankIsEmpty(){
+    public boolean fuelTankIsEmpty() {
         return fuelLevel == 0;
     }
+
     @Override
-    public void refuel(int amount){
+    public void refuel(int amount) {
         this.fuelLevel += amount;
     }
 
@@ -108,8 +114,7 @@ public abstract class SpaceShip extends SpaceEntity implements Fuellable {
         // Finally, add the crew member
         if (this.crewMembers.add(crew)) {
             System.out.printf("[MANIFEST] Welcome aboard '%s', %s!%n", this.getName(), crew.getName());
-        }
-        else{
+        } else {
             System.out.printf("[MANIFEST] '%s' is already registered on this ship.%n", crew.getName());
         }
     }

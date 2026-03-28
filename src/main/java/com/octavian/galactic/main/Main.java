@@ -3,11 +3,8 @@ package com.octavian.galactic.main;
 import com.octavian.galactic.exception.InsufficientContainmentException;
 import com.octavian.galactic.model.Size;
 import com.octavian.galactic.model.cargo.HazardousCargo;
-import com.octavian.galactic.model.spaceship.CargoShip;
-import com.octavian.galactic.model.spaceship.ScoutShip;
-import com.octavian.galactic.model.spaceship.SpaceShip;
-import com.octavian.galactic.model.station.CrewMember;
-import com.octavian.galactic.model.station.DockingBay;
+import com.octavian.galactic.model.spaceship.*;
+import com.octavian.galactic.model.station.*;
 import com.octavian.galactic.service.HubService;
 
 import java.util.ArrayList;

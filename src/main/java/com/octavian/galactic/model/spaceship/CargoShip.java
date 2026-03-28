@@ -25,7 +25,7 @@ public class CargoShip extends SpaceShip {
     }
 
     public static class Builder extends AbstractBuilder<Builder>{
-        private double maxCargoWeight = 0.0;
+        private double maxCargoWeight = 250.0;
 
         public Builder(String name, Size size){
             super(name, size);
