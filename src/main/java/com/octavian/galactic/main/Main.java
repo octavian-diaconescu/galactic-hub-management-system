@@ -13,7 +13,8 @@ import java.util.Scanner;
 
 public class Main {
     private static final Scanner scanner = new Scanner(System.in);
-    private static final HubService hub = new HubService("Omega Station");
+    private static final FuelDepot fuelDepot = new FuelDepot("Omega F-Depot", 10000, 8000);
+    private static final HubService hub = new HubService("Omega Station", fuelDepot);
     private static final List<SpaceShip> knownShips = new ArrayList<>();
 
     public static void main(String[] args) {

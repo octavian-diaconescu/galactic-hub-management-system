@@ -18,6 +18,7 @@ import static org.junit.jupiter.api.Assertions.*;
 public class HubServiceTest {
     private HubService hubService;
     private HubService mainHub;
+    private FuelDepot fuelDepot;
 
     private DockingBay dockingBay;
     private DockingBay dockingBay2;
@@ -38,8 +39,9 @@ public class HubServiceTest {
 
     @BeforeEach
     void setUp() {
-        mainHub = new HubService("MAIN HUB");
-        hubService = new HubService("HUB ALPHA");
+        fuelDepot = new FuelDepot("Fuel Depot", 10000, 8000);
+        mainHub = new HubService("MAIN HUB", fuelDepot);
+        hubService = new HubService("HUB ALPHA", fuelDepot);
 
         dockingBay = new DockingBay("Earth-Dock-1", Size.LARGE, false);
         dockingBay2 = new DockingBay("Earth-Dock-2", Size.LARGE, false);

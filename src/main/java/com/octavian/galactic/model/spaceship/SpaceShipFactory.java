@@ -19,14 +19,17 @@ public class SpaceShipFactory {
                    .fuelLevel(random.nextInt(40) + 20)
                    .hullIntegrity(random.nextInt(50) + 30)
                    .maxCargoWeight(random.nextInt(9000) + 1000)
+                   .maxCrewCapacity(random.nextInt(10) + 5)
                    .build();
            case 1 -> new ScoutShip.Builder(name, Size.SMALL)
+                   .maxCrewCapacity(random.nextInt(4) + 3)
                    .fuelLevel(random.nextInt(30) + 10)
                    .hullIntegrity(random.nextInt(40) + 40)
                    .sensorRange(random.nextInt(400) + 100)
                    .stealthState(random.nextBoolean())
                    .build();
            case 2 -> new FighterShip.Builder(name, randomSize())
+                   .maxCrewCapacity(random.nextInt(2) + 1)
                    .fuelLevel(random.nextInt(50) + 10)
                    .hullIntegrity(random.nextInt(60) + 20)
                    .primaryWeapon(randomWeapon())

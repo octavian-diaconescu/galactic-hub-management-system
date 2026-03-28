@@ -83,6 +83,11 @@ public abstract class SpaceShip extends SpaceEntity implements Fuellable {
     }
 
     @Override
+    public int getFuelCapacity() {
+        return 100;
+    }
+
+    @Override
     public boolean fuelTankIsEmpty() {
         return fuelLevel == 0;
     }

@@ -13,12 +13,16 @@ public class HubService {
     private final List<SpaceShip> registeredShips = new ArrayList<>(); // Keep a record of every ship that has ever visited
     private final Map<Integer, DockingBay> dockingBays = new HashMap<>(); // Manage physical locations
     private final String name;
+    private final FuelDepot fuelDepot;
+
     private Integer dockingBayNumber = 0; // For now, to prevent another O(n) search, the dockingBayNumber represents the manufacturing number
     // not an ordinal number, like in a parking lot. I would have to know which bay numbers previously existed and were unassigned
     // (like 1 2 x 4 x 6 7) and choose the first empty one to occupy.
 
-    public HubService(String name) {
+    public HubService(String name, FuelDepot fuelDepot) {
         this.name = name;
+        if (fuelDepot == null) throw new IllegalArgumentException("Fuel depot cannot be null");
+        this.fuelDepot = fuelDepot;
     }
 
     public String getName() {
@@ -262,7 +266,7 @@ public class HubService {
 
                 serviceMultiplier = 1.5; // Commercial surcharge for parts and labor
             }
-            case ScoutShip _ ->{
+            case ScoutShip _ -> {
                 baseFee = 100.0;
                 serviceMultiplier = 1.0;
             } // Standard light docking fee
@@ -278,7 +282,17 @@ public class HubService {
         double shipTotalBill = baseFee + (resourceCost * serviceMultiplier);
 
         // Perform the maintenance (State Change)
-        if (fuelNeeded > 0) dockedShip.setFuelLevel(100);
+        if (fuelNeeded > 0) {
+            if (fuelDepot.fuelTankIsEmpty()) {
+                System.out.printf("[HUB-BILLING] Warning: depot empty, '%s' could not be refueled%n",
+                        dockedShip.getName());
+                fuelNeeded = 0; // no fuel dispensed, don't bill for it
+            } else {
+                int dispensable = Math.min(fuelNeeded, fuelDepot.getFuelLevel());
+                fuelDepot.dispenseFuel(dockedShip, dispensable);
+                fuelNeeded = dispensable; // bill only for what was actually dispensed
+            }
+        }
         if (repairsNeeded > 0) dockedShip.setHullIntegrity(100);
 
         // I may want to decouple the invoice logic from the calculation of the docking fee
