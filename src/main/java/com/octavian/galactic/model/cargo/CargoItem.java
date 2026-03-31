@@ -2,8 +2,6 @@ package com.octavian.galactic.model.cargo;
 
 import com.octavian.galactic.model.SpaceEntity;
 
-//TODO: implement factory pattern
-
 // A CargoItem derived object describes a type of cargo a cargo ship can hold
 public abstract class CargoItem extends SpaceEntity {
     private final double weight;
@@ -34,13 +32,13 @@ public abstract class CargoItem extends SpaceEntity {
 
 
     public void printItemInfo(){
-        System.out.printf("*%s:%.2f(Tonnes)%n", name, weight);
+        System.out.printf("*%s:%.2f(Tonnes)%n", this.getName(), weight);
         System.out.printf("----->(%s)%n", description);
     }
 
     @Override
     public String toString() {
-        return  '\'' + name + '\'';
+        return  '\'' + this.getName() + '\'';
     }
 
 //    public String getDescription(){

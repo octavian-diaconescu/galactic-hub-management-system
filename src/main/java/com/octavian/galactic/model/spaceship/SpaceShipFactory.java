@@ -1,5 +1,6 @@
 package com.octavian.galactic.model.spaceship;
 
+import com.octavian.galactic.model.ShipType;
 import com.octavian.galactic.model.Size;
 
 import java.util.Random;
@@ -12,32 +13,31 @@ public class SpaceShipFactory {
 
     public static SpaceShip createRandomArrival(){
         String name = SHIP_NAMES[random.nextInt(SHIP_NAMES.length)];
-        int type = random.nextInt(3);
+        ShipType shipType = randomShipType();
 
-       return switch (type){
-           case 0 -> new CargoShip.Builder(name, randomSize())
+       return switch (shipType){
+           case CARGO -> new CargoShip.Builder(name, randomSize())
                    .fuelLevel(random.nextInt(40) + 20)
-                   .hullIntegrity(random.nextInt(50) + 30)
+                   .hullIntegrity(random.nextInt(50) + 50)
                    .maxCargoWeight(random.nextInt(9000) + 1000)
                    .maxCrewCapacity(random.nextInt(10) + 5)
                    .build();
-           case 1 -> new ScoutShip.Builder(name, Size.SMALL)
+           case SCOUT -> new ScoutShip.Builder(name, Size.SMALL)
                    .maxCrewCapacity(random.nextInt(4) + 3)
-                   .fuelLevel(random.nextInt(30) + 10)
-                   .hullIntegrity(random.nextInt(40) + 40)
+                   .fuelLevel(random.nextInt(30) + 20)
+                   .hullIntegrity(random.nextInt(40) + 60)
                    .sensorRange(random.nextInt(400) + 100)
                    .stealthState(random.nextBoolean())
                    .build();
-           case 2 -> new FighterShip.Builder(name, randomSize())
+           case FIGHTER -> new FighterShip.Builder(name, randomSize())
                    .maxCrewCapacity(random.nextInt(2) + 1)
                    .fuelLevel(random.nextInt(50) + 10)
-                   .hullIntegrity(random.nextInt(60) + 20)
+                   .hullIntegrity(random.nextInt(60) + 40)
                    .primaryWeapon(randomWeapon())
                    .ammunitionCount(random.nextInt(20) + 10)
                    .shieldStrength(random.nextInt(50) + 10)
                    .weaponsArmed(random.nextBoolean())
                    .build();
-           default -> throw new IllegalStateException("Unexpected type: " + type);
        };
     }
 
@@ -49,5 +49,10 @@ public class SpaceShipFactory {
     private static FighterShip.WeaponClass randomWeapon(){
         FighterShip.WeaponClass[] weaponClasses = FighterShip.WeaponClass.values();
         return weaponClasses[random.nextInt(weaponClasses.length)];
+    }
+
+    private static ShipType randomShipType() {
+        ShipType[] shipTypes = ShipType.values();
+        return shipTypes[random.nextInt(shipTypes.length)];
     }
 }

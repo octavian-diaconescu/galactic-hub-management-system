@@ -21,12 +21,12 @@ public class FuelDepot extends SpaceEntity implements Fuellable {
         if (amount <= 0)
             throw new IllegalArgumentException("Dispense amount must be positive");
         if (fuelLevel < amount)
-            throw new InsufficientFuelException(this.name, amount, fuelLevel);
+            throw new InsufficientFuelException(this.getName(), amount, fuelLevel);
 
         fuelLevel -= amount;
         ship.setFuelLevel(ship.getFuelLevel() + amount);
         System.out.printf("[DEPOT] '%s' dispensed %d units to '%s'. Depot reserve: %d/%d%n",
-                this.name, amount, ship.getName(), fuelLevel, fuelCapacity);
+                this.getName(), amount, ship.getName(), fuelLevel, fuelCapacity);
     }
 
     @Override
@@ -37,7 +37,7 @@ public class FuelDepot extends SpaceEntity implements Fuellable {
         int actualAmount = Math.min(amount, space); // can't exceed capacity
         fuelLevel += actualAmount;
         System.out.printf("[DEPOT] '%s' restocked by %d units. Reserve: %d/%d%n",
-                this.name, actualAmount, fuelLevel, fuelCapacity);
+                this.getName(), actualAmount, fuelLevel, fuelCapacity);
         if (actualAmount < amount)
             System.out.printf("[DEPOT] Warning: depot full, %d units discarded%n",
                     amount - actualAmount);

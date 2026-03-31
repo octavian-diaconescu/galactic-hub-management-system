@@ -4,7 +4,7 @@ import java.util.Objects;
 import java.util.UUID;
 
 public abstract class SpaceEntity {
-    protected String name;
+    private String name;
     private final UUID id;
 
     public SpaceEntity(String name){

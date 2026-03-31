@@ -11,8 +11,6 @@ import java.util.TreeSet;
 import java.util.Collections;
 import java.util.UUID;
 
-//TODO: implement builder pattern
-
 // The base for all flying vehicles
 public abstract class SpaceShip extends SpaceEntity implements Fuellable {
     private int fuelLevel; // 0 to 100 reinforced in the setter function
@@ -114,7 +112,7 @@ public abstract class SpaceShip extends SpaceEntity implements Fuellable {
         }
         // Check for capacity constraints
         if (crewMembers.size() + 1 > maxCrewCapacity) {
-            throw new CrewCapacityExceededException(this.name, this.maxCrewCapacity);
+            throw new CrewCapacityExceededException(this.getName(), this.maxCrewCapacity);
         }
         // Finally, add the crew member
         if (this.crewMembers.add(crew)) {
@@ -132,6 +130,34 @@ public abstract class SpaceShip extends SpaceEntity implements Fuellable {
     public Set<CrewMember> getCrewMembers() {
         // Return an unmodifiable set to enforce the use of removeCrewMember and addCrewMember methods
         return Collections.unmodifiableSet(crewMembers);
+    }
+
+    public boolean travel(int distance) {
+        if (distance <= 0) {
+            throw new IllegalArgumentException("Distance must be positive");
+        }
+
+        int fuelCost = calculateFuelCost(distance);
+
+        if (fuelLevel < fuelCost) {
+            System.out.printf("[NAV] '%s' cannot travel %d units: needs %d fuel, has %d.%n", this.getName(), distance, fuelCost, fuelLevel);
+            return false;
+        }
+
+        setFuelLevel(fuelLevel - fuelCost);
+        System.out.printf("[NAV] '%s' successfully traveled %d units. Fuel: %d -> %d%n", this.getName(), distance, fuelLevel + fuelCost, fuelLevel);
+        return true;
+    }
+
+    public int calculateFuelCost(int distance) {
+        // TODO: refactor for ship sizes AND different ship types
+        int sizeMultiplier = switch (shipSize) {
+            case SMALL -> 1;
+            case MEDIUM -> 2;
+            case LARGE -> 3;
+        };
+
+        return Math.max(1, (distance / 100) * sizeMultiplier);
     }
 
 }

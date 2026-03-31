@@ -55,6 +55,6 @@ public class CrewMember extends SpaceEntity implements Comparable<CrewMember> {
 
     @Override
     public String toString() {
-        return name + '(' + rank + ')';
+        return this.getName() + '(' + rank + ')';
     }
 }
