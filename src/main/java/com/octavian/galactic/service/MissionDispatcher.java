@@ -27,6 +27,7 @@ public class MissionDispatcher {
 
     public static MissionResult dispatch(SpaceShip ship, Mission mission) {
         // Inside this validation function we also check if the ship has enough fuel to be dispatched
+        // This accounts only for a one-way trip
         validateDispatch(ship, mission);
 
         int fuelCost = ship.calculateFuelCost(mission.distance());

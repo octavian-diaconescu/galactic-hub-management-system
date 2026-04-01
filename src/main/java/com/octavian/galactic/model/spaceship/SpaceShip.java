@@ -16,8 +16,8 @@ public abstract class SpaceShip extends SpaceEntity implements Fuellable {
     private int fuelLevel; // 0 to 100 reinforced in the setter function
     private int hullIntegrity; // 0 to 100 reinforced in the setter function
     private final int maxCrewCapacity;
+    private boolean docked;
     private final Size shipSize;
-
     private final Set<CrewMember> crewMembers = new TreeSet<>();
 
     protected SpaceShip(AbstractBuilder<?> builder) {
@@ -73,6 +73,14 @@ public abstract class SpaceShip extends SpaceEntity implements Fuellable {
             throw new IllegalArgumentException("Fuel must be between 0 and 100");
         }
         this.fuelLevel = fuelLevel;
+    }
+
+    public boolean isDocked() {
+        return docked;
+    }
+
+    public void setDocked(boolean docked) {
+        this.docked = docked;
     }
 
     @Override

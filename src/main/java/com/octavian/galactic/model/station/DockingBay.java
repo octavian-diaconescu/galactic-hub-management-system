@@ -18,6 +18,9 @@ public class DockingBay extends SpaceEntity {
     }
 
     public void dockSpaceShip(SpaceShip spaceShip) {
+        if(spaceShip.isDocked()){
+            throw new IllegalStateException("Ship is already docked");
+        }
         if (spaceShip.getShipSize().ordinal() > baySize.ordinal()) {
             throw new IllegalArgumentException(
                     String.format("[BSP] '%s' (%s) is too large for bay '%s' (%s)", // BSP = Bay Service Provider
@@ -26,6 +29,7 @@ public class DockingBay extends SpaceEntity {
         }
         this.spaceShip = spaceShip;
         this.isOccupied = true;
+        this.spaceShip.setDocked(true);
     }
 
     public void undockSpaceShip() {
@@ -34,6 +38,7 @@ public class DockingBay extends SpaceEntity {
             return;
         }
         System.out.printf("[BSP] SpaceShip '%s' has been undocked%n", this.spaceShip.getName());
+        this.spaceShip.setDocked(false);
         this.spaceShip = null;
         this.isOccupied = false;
     }

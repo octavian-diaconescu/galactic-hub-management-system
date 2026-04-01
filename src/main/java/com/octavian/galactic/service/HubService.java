@@ -97,7 +97,11 @@ public class HubService {
 
                             } else if (ship.getShipSize().compareTo(bay.getBaySize()) <= 0) {
                                 // Size validation is enforced by the bay itself through the dockSpaceShip method
-                                bay.dockSpaceShip(ship);
+                                try {
+                                    bay.dockSpaceShip(ship);
+                                } catch (IllegalStateException e) {
+                                    System.out.println("[HUB] Error: " + e.getMessage());
+                                }
                                 System.out.printf("[HUB] Success: '%s' parked in bay %d%n", ship.getName(), bayNumber);
                             } else {
                                 System.out.printf("[HUB] Error: Ship '%s' is too large for bay %d%n", ship.getName(), bayNumber);

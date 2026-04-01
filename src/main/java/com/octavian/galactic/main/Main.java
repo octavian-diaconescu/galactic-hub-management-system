@@ -5,7 +5,8 @@ import com.octavian.galactic.model.Size;
 import com.octavian.galactic.model.cargo.HazardousCargo;
 import com.octavian.galactic.model.spaceship.*;
 import com.octavian.galactic.model.station.*;
-import com.octavian.galactic.service.HubService;
+import com.octavian.galactic.service.*;
+import com.octavian.galactic.model.mission.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -17,7 +18,7 @@ public class Main {
     private static final HubService hub = new HubService("Omega Station", fuelDepot);
     private static final List<SpaceShip> knownShips = new ArrayList<>();
 
-    public static void main(String[] args) {
+    static void main(String[] args) {
         initializeStation();
         runMenu();
     }
@@ -75,6 +76,7 @@ public class Main {
             System.out.println("5. Generate Personnel Report");
             System.out.println("6. Run End-of-Day Billing");
             System.out.println("7. Trigger Emergency Evacuation");
+            System.out.println("8. Dispatch Ship on Mission");
             System.out.println("0. Exit Terminal");
             System.out.print("Select an option: ");
 
@@ -88,6 +90,7 @@ public class Main {
                 case "5" -> hub.generatePersonnelReport();
                 case "6" -> hub.calculateTotalDockingFees();
                 case "7" -> hub.emergencyEvacuation();
+                case "8" -> handleMissionDispatch();
                 case "0" -> {
                     System.out.println("Shutting down terminal. Goodbye.");
                     running = false;
@@ -111,21 +114,27 @@ public class Main {
             System.out.printf("%d. %s [%s]%n", i + 1, knownShips.get(i).getName(), knownShips.get(i).getShipSize());
         }
         System.out.print("Select a ship to dock (enter number): ");
-        int shipChoice = Integer.parseInt(scanner.nextLine()) - 1;
+        try {
+            int shipChoice = Integer.parseInt(scanner.nextLine()) - 1;
 
-        System.out.print("Select a bay number to dock in (1-3): ");
-        int bayChoice = Integer.parseInt(scanner.nextLine());
+            System.out.print("Select a bay number to dock in: ");
+            int bayChoice = Integer.parseInt(scanner.nextLine());
 
-        if (shipChoice >= 0 && shipChoice < knownShips.size()) {
-            SpaceShip selectedShip = knownShips.get(shipChoice);
-            hub.assignShipToBay(selectedShip.getId(), bayChoice);
-        } else {
-            System.out.println("Invalid ship selection.");
+            if (shipChoice >= 0 && shipChoice < knownShips.size()) {
+                SpaceShip selectedShip = knownShips.get(shipChoice);
+                hub.assignShipToBay(selectedShip.getId(), bayChoice);
+            } else {
+                System.out.println("Invalid ship selection.");
+            }
+        } catch (NumberFormatException e) {
+            System.out.println("Invalid input. Please enter a valid number.");
+        } catch (Exception e) {
+            System.out.println("Error: " + e.getMessage());
         }
     }
 
     private static void handleUndocking() {
-        System.out.print("Enter the Bay Number to clear (1-3): ");
+        System.out.print("Enter the Bay Number to clear: ");
         try {
             int bayChoice = Integer.parseInt(scanner.nextLine());
             DockingBay bay = hub.getDockingBays().get(bayChoice);
@@ -136,25 +145,67 @@ public class Main {
                 System.out.println("That bay is already empty or does not exist.");
             }
         } catch (NumberFormatException e) {
-            System.out.println("Invalid input.");
+            System.out.println("Invalid input. Please enter a number.");
+        } catch (Exception e) {
+            System.out.println("Error: " + e.getMessage());
         }
     }
 
     private static void handleHazardScan() {
         System.out.println("\n--- HAZARD SCANNER ---");
-        for (int i = 0; i < knownShips.size(); i++) {
-            System.out.printf("%d. %s%n", i + 1, knownShips.get(i).getName());
+        System.out.println("Docked ships: ");
+
+        boolean isOccupied = true;
+        List<DockingBay> occupiedBays = hub.getBaysByStatus(isOccupied);
+        List<SpaceShip> dockedShips = new ArrayList<>();
+        if(occupiedBays.isEmpty()){
+            return;
         }
-        System.out.print("Select a ship to scan (enter number): ");
+
+        occupiedBays.forEach(bay -> dockedShips.add(bay.getSpaceShip()));
+
+        System.out.println(dockedShips);
+
+        for (SpaceShip dockedShip : dockedShips) {
+            hub.scanShipForHazards(dockedShip.getId());
+        }
+    }
+
+    private static void handleMissionDispatch() {
+        System.out.println("\n--- MISSION BOARD ---");
+        for (int i = 0; i < knownShips.size(); i++) {
+            System.out.printf("[%s] %d. %s (Fuel: %d%%)%n", knownShips.get(i).getClass().getSimpleName(), i + 1, knownShips.get(i).getName(), knownShips.get(i).getFuelLevel());
+        }
+        System.out.print("Select a ship to dispatch (enter number): ");
         try {
             int shipChoice = Integer.parseInt(scanner.nextLine()) - 1;
-            if (shipChoice >= 0 && shipChoice < knownShips.size()) {
-                hub.scanShipForHazards(knownShips.get(shipChoice).getId());
-            } else {
+            if (shipChoice < 0 || shipChoice >= knownShips.size()) {
                 System.out.println("Invalid selection.");
+                return;
             }
+            SpaceShip selectedShip = knownShips.get(shipChoice);
+
+            System.out.println("Available Mission Types: 1. PATROL  2. EXPLORE  3. HAUL");
+            System.out.print("Select mission type: ");
+            int typeChoice = Integer.parseInt(scanner.nextLine());
+
+            MissionType type = switch (typeChoice) {
+                case 1 -> MissionType.PATROL;
+                case 2 -> MissionType.EXPLORE;
+                case 3 -> MissionType.HAUL;
+                default -> throw new IllegalArgumentException("Invalid mission type");
+            };
+
+            System.out.print("Enter mission distance (e.g., 500): ");
+            int distance = Integer.parseInt(scanner.nextLine());
+
+            Mission mission = new Mission("Sector " + (int) (Math.random() * 100) + " Operation", type, distance, 1500.0);
+            MissionDispatcher.dispatch(selectedShip, mission);
+
         } catch (NumberFormatException e) {
-            System.out.println("Invalid input.");
+            System.out.println("Invalid input. Please enter a valid number.");
+        } catch (IllegalStateException | IllegalArgumentException e) {
+            System.out.println("Mission Aborted: " + e.getMessage());
         }
     }
 }
