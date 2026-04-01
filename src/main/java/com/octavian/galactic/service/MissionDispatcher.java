@@ -16,15 +16,6 @@ public class MissionDispatcher {
     private MissionDispatcher() {
     }
 
-    private static  MissionDispatcher instance;
-
-    public static MissionDispatcher getInstance() {
-        if(instance == null) {
-            return new MissionDispatcher();
-        }
-        return instance;
-    }
-
     public static MissionResult dispatch(SpaceShip ship, Mission mission) {
         // Inside this validation function we also check if the ship has enough fuel to be dispatched
         // This accounts only for a one-way trip

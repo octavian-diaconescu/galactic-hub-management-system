@@ -18,7 +18,7 @@ public class Main {
     private static final HubService hub = new HubService("Omega Station", fuelDepot);
     private static final List<SpaceShip> knownShips = new ArrayList<>();
 
-    static void main(String[] args) {
+    public static void main(String[] args) {
         initializeStation();
         runMenu();
     }
