@@ -3,13 +3,25 @@ package com.octavian.galactic.model.station;
 import com.octavian.galactic.model.Size;
 import com.octavian.galactic.model.SpaceEntity;
 import com.octavian.galactic.model.spaceship.SpaceShip;
+import jakarta.persistence.*;
 
 // A physical location where a ship can park
+@Entity
+@Table(name = "docking_bay")
 public class DockingBay extends SpaceEntity {
-    private final Size baySize;
+    @Enumerated(EnumType.STRING)
+    @Column(name = "bay_size", nullable = false)
+    private Size baySize;
+
+    @Column(name = "is_occupied", nullable = false)
     private boolean isOccupied;
+
+    @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @JoinColumn(name = "spaceship_id", unique = true)
+    @Column(nullable = true)
     private SpaceShip spaceShip; // Can be null if the respective bay is empty
 
+    protected DockingBay() {}
 
     public DockingBay(String name, Size baySize, boolean isOccupied) {
         super(name);

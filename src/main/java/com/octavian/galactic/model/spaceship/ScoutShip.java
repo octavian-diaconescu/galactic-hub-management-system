@@ -1,11 +1,16 @@
 package com.octavian.galactic.model.spaceship;
 
 import com.octavian.galactic.model.Size;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Table;
 
+@Entity
+@Table(name = "scout_ship")
 // A fast, light ship for exploration (doesn't store cargo)
 public class ScoutShip extends SpaceShip {
     private int sensorRange; // How far it can detect other objects
     private boolean isStealthEnabled; // Toggle for radar visibility
+
 
     private ScoutShip(Builder builder) {
         super(builder);

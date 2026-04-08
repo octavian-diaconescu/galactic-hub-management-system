@@ -1,12 +1,23 @@
 package com.octavian.galactic.model.station;
 
 import com.octavian.galactic.model.SpaceEntity;
+import jakarta.persistence.*;
 
 import java.util.Objects;
+import java.util.UUID;
 
+@Entity
+@Table(name = "crew_member")
 public class CrewMember extends SpaceEntity implements Comparable<CrewMember> {
-    private final Species species;
-    private final Rank rank;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false, length = 32)
+    private Species species;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false, length = 32)
+    private Rank rank;
+
 
     public enum Rank {
         COMMANDER,    // Top authority
@@ -24,7 +35,7 @@ public class CrewMember extends SpaceEntity implements Comparable<CrewMember> {
         VYKEEN,
         ATLAS
     }
-
+    protected CrewMember(){}
     public CrewMember(String name, Rank rank, Species species) {
         super(name);
         this.rank = Objects.requireNonNull(rank, "Rank cannot be null");
