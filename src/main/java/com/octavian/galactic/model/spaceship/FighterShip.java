@@ -1,9 +1,14 @@
 package com.octavian.galactic.model.spaceship;
 
 import com.octavian.galactic.model.Size;
+import jakarta.persistence.*;
 
 //TODO: implement game logic
 // I'm getting closer and closer to turning this into a game, which is beyond the scope of the project's requirements :)
+
+@Entity
+@Table(name = "fighter_ship")
+@DiscriminatorValue("FIGHTER")
 public class FighterShip extends SpaceShip {
     public enum WeaponClass {
         LASER,   // Fast, energy-based
@@ -11,10 +16,20 @@ public class FighterShip extends SpaceShip {
         RAILGUN  // Armor-piercing
     }
 
-    private final WeaponClass primaryWeapon;
+    @Enumerated(EnumType.STRING)
+    @Column(name = "primary_weapon", nullable = false)
+    private WeaponClass primaryWeapon;
+
+    @Column(name = "shield_strength", nullable = false)
     private int shieldStrength;         // 0 to 100
+
+    @Column(name = "ammunition_count", nullable = false)
     private int ammunitionCount;
+
+   @Transient
     private boolean weaponsArmed;
+
+   protected FighterShip(){}
 
     private FighterShip(Builder builder) {
         super(builder);

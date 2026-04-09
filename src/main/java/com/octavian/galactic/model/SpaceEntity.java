@@ -13,7 +13,7 @@ import java.util.UUID;
 public abstract class SpaceEntity {
     @Id
     @GeneratedValue
-    @UuidGenerator
+    @UuidGenerator(style = UuidGenerator.Style.RANDOM)
     @Column(nullable = false, updatable = false, columnDefinition = "uuid")
     private UUID id;
 
@@ -25,6 +25,7 @@ public abstract class SpaceEntity {
 
     public SpaceEntity(String name) {
         this.name = Objects.requireNonNull(name, "Name cannot be null");
+        this.id = UUID.randomUUID();
     }
 
     public void setName(String name) {
@@ -41,15 +42,13 @@ public abstract class SpaceEntity {
 
     @Override
     public boolean equals(Object o) {
-        if (o == null || getClass() != o.getClass()) return false;
-        SpaceEntity that = (SpaceEntity) o;
-        return Objects.equals(id, that.id);
+        return o instanceof SpaceEntity && ((SpaceEntity) o).id.equals(id); // Refactor deemed necessary because of the hibernate guide(https://docs.hibernate.org/orm/7.0/introduction/html_single/#equals-and-hash)
     }
 
     @Override
     public int hashCode() {
-        return Objects.hashCode(id);
-    }
+        return id.hashCode();
+    } // Same refactor reason
 
     @Override
     public String toString() {

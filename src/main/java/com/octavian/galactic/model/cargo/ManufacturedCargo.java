@@ -1,12 +1,24 @@
 package com.octavian.galactic.model.cargo;
 
+import jakarta.persistence.Column;
+import jakarta.persistence.DiscriminatorValue;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Table;
+
+//TODO: instantiate class
+@Entity
+@Table(name = "manufactured_cargo")
+@DiscriminatorValue("MANUFACTURED")
 public class ManufacturedCargo extends CargoItem{
-    private final int fragilityIndex; // 1 through 10
+    @Column(name = "fragil_index", nullable = false)
+    private int fragilityIndex; // 1 through 10
     public enum FragilityTier {
         ROBUST,     // 1-3: No special handling
         DELICATE,   // 4-6: Handle with care
         CRITICAL    // 7-10: Shock-proof packaging and upright storage mandatory
     }
+
+    protected ManufacturedCargo(){}
 
     public ManufacturedCargo(String name, double weight, int fragilityIndex) {
         super(name, weight);

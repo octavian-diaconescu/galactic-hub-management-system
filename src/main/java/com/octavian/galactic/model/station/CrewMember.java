@@ -1,10 +1,10 @@
 package com.octavian.galactic.model.station;
 
 import com.octavian.galactic.model.SpaceEntity;
+import com.octavian.galactic.model.spaceship.SpaceShip;
 import jakarta.persistence.*;
 
 import java.util.Objects;
-import java.util.UUID;
 
 @Entity
 @Table(name = "crew_member")
@@ -35,7 +35,14 @@ public class CrewMember extends SpaceEntity implements Comparable<CrewMember> {
         VYKEEN,
         ATLAS
     }
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "ship_id", nullable = true)
+    private SpaceShip ship;
+
+
     protected CrewMember(){}
+
     public CrewMember(String name, Rank rank, Species species) {
         super(name);
         this.rank = Objects.requireNonNull(rank, "Rank cannot be null");
@@ -44,6 +51,9 @@ public class CrewMember extends SpaceEntity implements Comparable<CrewMember> {
 
     public Species getSpecies() {
         return species;
+    }
+    public void setShip(SpaceShip ship) {
+        this.ship = ship;
     }
 
     @Override

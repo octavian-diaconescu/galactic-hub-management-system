@@ -4,23 +4,34 @@
              xsi:schemaLocation="https://jakarta.ee/xml/ns/persistence https://jakarta.ee/xml/ns/persistence/persistence_3_1.xsd"
              version="3.1">
 
-    <persistence-unit name="com.octavian.galactic-hub">
-        <class></class>
+    <persistence-unit name="com.octavian.galactic">
+        <class>com.octavian.galactic.model.SpaceEntity</class>
+        <class>com.octavian.galactic.model.spaceship.SpaceShip</class>
+        <class>com.octavian.galactic.model.spaceship.CargoShip</class>
+        <class>com.octavian.galactic.model.spaceship.ScoutShip</class>
+        <class>com.octavian.galactic.model.spaceship.FighterShip</class>
+        <class>com.octavian.galactic.model.station.CrewMember</class>
+        <class>com.octavian.galactic.model.station.DockingBay</class>
+        <class>com.octavian.galactic.model.cargo.CargoItem</class>
+        <class>com.octavian.galactic.model.cargo.HazardousCargo</class>
+        <class>com.octavian.galactic.model.cargo.AgriculturalCargo</class>
+        <class>com.octavian.galactic.model.cargo.ManufacturedCargo</class>
+        <class>com.octavian.galactic.model.cargo.RawMaterialCargo</class>
+        <class>com.octavian.galactic.model.spaceship.CargoManifestEntry</class>
+
         <properties>
             <property name="jakarta.persistence.jdbc.driver" value="org.postgresql.Driver"/>
 
             <property name="jakarta.persistence.jdbc.url"
                       value="jdbc:postgresql://localhost:5432/galactic-hub"/>
 
-            <property name="jakarta.persistence.jdbc.user" value=""/>
-            <property name="jakarta.persistence.jdbc.password" value=""/>
+            <property name="jakarta.persistence.schema-generation.database.action" value="drop-and-create"/>
+            <property name="jakarta.persistence.schema-generation.scripts.create-target" value="schema-create.sql"/>
+            <property name="jakarta.persistence.schema-generation.scripts.drop-target" value="schema-drop.sql"/>
 
-            <property name="jakarta.persistence.schema-generation.database.action"
-                      value="drop-and-create"/>
-
-            <property name="hibernate.show_sql" value="true"/>
-            <property name="hibernate.format_sql" value="true"/>
-            <property name="hibernate.highlight_sql" value="true"/>
+<!--            <property name="hibernate.show_sql" value="true"/>-->
+<!--            <property name="hibernate.format_sql" value="true"/>-->
+<!--            <property name="hibernate.highlight_sql" value="true"/>-->
         </properties>
 
     </persistence-unit>

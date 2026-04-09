@@ -1,10 +1,24 @@
 package com.octavian.galactic.model.cargo;
 
+
+import jakarta.persistence.Column;
+import jakarta.persistence.DiscriminatorValue;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Table;
+
+@Entity
+@Table(name = "hazardous_cargo")
+@DiscriminatorValue("HAZARD")
 public class HazardousCargo extends CargoItem {
     private static final int DANGEROUS_RADIATION_THRESHOLD = 7;
 
+    @Column(name = "radiation_level", nullable = false)
     private int radiationLevel;
-    private final String containmentType; // e.g: Lead-lined, Cryogenic. Can be anything the user decides
+
+    @Column(name = "containment_type", nullable = false)
+    private String containmentType; // e.g: Lead-lined, Cryogenic. Can be anything the user decides
+
+    protected HazardousCargo(){}
 
     public HazardousCargo(String name, double weight, int radiationLevel, String containmentType) {
         super(name, weight);

@@ -1,8 +1,23 @@
 package com.octavian.galactic.model.cargo;
 
+
+import jakarta.persistence.Column;
+import jakarta.persistence.DiscriminatorValue;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Table;
+
+//TODO: instantiate class
+@Entity
+@Table(name = "agricultural_cargo")
+@DiscriminatorValue("AGRICULTURAL")
 public class AgriculturalCargo extends CargoItem{
-    private final boolean requiresRefrigeration;
-    private final int daysUntilSpoilage;
+    @Column(name = "requires_refrigeration", nullable = false)
+    private boolean requiresRefrigeration;
+
+    @Column(name = "until_spoilage",  nullable = false)
+    private int daysUntilSpoilage;
+
+    protected AgriculturalCargo() {}
 
     public AgriculturalCargo(String name, double weight, int daysUntilSpoilage, boolean requiresRefrigeration) {
         super(name, weight);

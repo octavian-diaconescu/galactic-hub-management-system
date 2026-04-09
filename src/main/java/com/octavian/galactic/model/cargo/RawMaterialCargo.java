@@ -1,10 +1,20 @@
 package com.octavian.galactic.model.cargo;
 
+import jakarta.persistence.*;
+
+//TODO: instantiate class
+@Entity
+@Table(name = "raw_material_cargo")
+@DiscriminatorValue("RAW_MAT")
 public class RawMaterialCargo extends CargoItem {
     private static final double HIGH_PURITY_THRESHOLD = 90.0;
 
-    private final StateOfMatter stateOfMatter;
-    private final double purityPercentage;
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private StateOfMatter stateOfMatter;
+
+    @Column(name = "purity_percentage", nullable = false)
+    private double purityPercentage;
 
     public enum StateOfMatter {
         SOLID,
@@ -12,6 +22,8 @@ public class RawMaterialCargo extends CargoItem {
         GAS,
         PLASMA
     }
+
+    protected RawMaterialCargo(){}
 
     public RawMaterialCargo(String name, double weight, StateOfMatter SoM, double purityPercentage) {
         super(name, weight);

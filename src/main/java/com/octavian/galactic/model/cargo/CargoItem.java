@@ -1,11 +1,20 @@
 package com.octavian.galactic.model.cargo;
 
 import com.octavian.galactic.model.SpaceEntity;
+import jakarta.persistence.*;
 
+@Entity
+@Table(name = "cargo_item")
+@Inheritance(strategy = InheritanceType.JOINED)
+@DiscriminatorColumn(name = "cargo_type", discriminatorType = DiscriminatorType.STRING)
 // A CargoItem derived object describes a type of cargo a cargo ship can hold
 public abstract class CargoItem extends SpaceEntity {
-    private final double weight;
-    private final String description;
+    @Column(nullable = false)
+    private double weight;
+
+    private String description;
+
+    protected CargoItem(){}
 
     public CargoItem(String name, double weight){
         super(name);

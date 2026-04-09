@@ -27,4 +27,5 @@ target/
 .idea/
 *.iml
 .env
+.env.persistence
 .cursor/

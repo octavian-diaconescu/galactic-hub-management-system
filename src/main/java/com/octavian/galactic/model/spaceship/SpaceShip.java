@@ -5,20 +5,39 @@ import com.octavian.galactic.model.Fuellable;
 import com.octavian.galactic.model.SpaceEntity;
 import com.octavian.galactic.model.station.CrewMember;
 import com.octavian.galactic.model.Size;
+import jakarta.persistence.*;
 
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.Collections;
 import java.util.UUID;
 
+@Entity
+@Table(name = "spaceship")
+@Inheritance(strategy = InheritanceType.JOINED)
+@DiscriminatorColumn(name = "ship_type", discriminatorType = DiscriminatorType.STRING)
 // The base for all flying vehicles
 public abstract class SpaceShip extends SpaceEntity implements Fuellable {
+    @Column(name = "fuel_level", nullable = false)
     private int fuelLevel; // 0 to 100 reinforced in the setter function
+
+    @Column(name = "hull_integrity", nullable = false)
     private int hullIntegrity; // 0 to 100 reinforced in the setter function
-    private final int maxCrewCapacity;
+
+    @Column(name = "max_crew_capacity", nullable = false)
+    private int maxCrewCapacity;
+
+    @Column(name = "is_docked", nullable = false)
     private boolean docked;
-    private final Size shipSize;
-    private final Set<CrewMember> crewMembers = new TreeSet<>();
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "size", nullable = false)
+    private Size shipSize;
+
+    @OneToMany(mappedBy = "ship", cascade = CascadeType.ALL,  orphanRemoval = true)
+    private Set<CrewMember> crewMembers = new TreeSet<>();
+
+    protected SpaceShip(){}
 
     protected SpaceShip(AbstractBuilder<?> builder) {
         super(builder.name);
@@ -131,8 +150,14 @@ public abstract class SpaceShip extends SpaceEntity implements Fuellable {
     }
 
     public void removeCrewMember(UUID crewID) {
-        // Remove the crew member by UUID
-        this.crewMembers.removeIf(m -> m.getId().equals(crewID));
+        // Remove the crew member by UUID and nullify the link between the crew member and the ship(Hibernate logic)
+        crewMembers.stream()
+                .filter(c -> c.getId().equals(crewID))
+                .findFirst()
+                .ifPresent(crew ->{
+                    crewMembers.remove(crew);
+                    crew.setShip(null);
+                });
     }
 
     public Set<CrewMember> getCrewMembers() {

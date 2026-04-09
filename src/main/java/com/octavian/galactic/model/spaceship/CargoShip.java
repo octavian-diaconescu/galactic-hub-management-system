@@ -5,16 +5,23 @@ import com.octavian.galactic.exception.InsufficientContainmentException;
 import com.octavian.galactic.model.Size;
 import com.octavian.galactic.model.cargo.CargoItem;
 import com.octavian.galactic.model.cargo.HazardousCargo;
+import jakarta.persistence.*;
 
-import java.util.Collections;
-import java.util.LinkedHashMap;
-import java.util.Map;
+import java.util.*;
+import java.util.stream.Collectors;
 
+@Entity
+@Table(name = "cargo_ship")
+@DiscriminatorValue("CARGO")
 // Heavy hauler space vehicle
 public class CargoShip extends SpaceShip {
-    private final double maxCargoWeight;
-    private final Map<CargoItem, Integer> cargoManifest = new LinkedHashMap<>();
+    @Column(name = "max_cargo_weight", nullable = false)
+    private double maxCargoWeight;
 
+    @OneToMany(mappedBy = "cargoShip", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<CargoManifestEntry> cargoManifestLine = new ArrayList<>();
+
+    protected CargoShip() {}
 
     private CargoShip(Builder builder) {
         super(builder);
@@ -53,10 +60,8 @@ public class CargoShip extends SpaceShip {
             System.out.println("[LOGISTICS] Cannot insert a null item or with a quantity of 0!");
             return;
         }
-        double currentWeight = cargoManifest
-                .entrySet()
-                .stream()
-                .mapToDouble(e -> e.getKey().getWeight() * e.getValue())
+        double currentWeight = cargoManifestLine.stream()
+                .mapToDouble(e -> e.getCargoItem().getWeight() * e.getQuantity())
                 .sum();
 
         if (currentWeight + item.getWeight() * quantity > maxCargoWeight) {
@@ -70,16 +75,31 @@ public class CargoShip extends SpaceShip {
                 throw new InsufficientContainmentException(item.getName(), ((HazardousCargo) item).getContainmentType());
             }
         }
-        cargoManifest.put(item, cargoManifest.getOrDefault(item, 0) + quantity);
+        cargoManifestLine.stream()
+                .filter(e -> e.getCargoItem().equals(item))
+                .findFirst()
+                .ifPresentOrElse(
+                        e -> e.addQuantity(quantity),
+                        () -> cargoManifestLine.add(new CargoManifestEntry(this, item, quantity)));
         System.out.printf("[LOGISTICS] Loaded %s with [%d] x '%s' %n", this.getName(), quantity, item.getName());
     }
 
     public Map<CargoItem, Integer> getCargoManifest(){
-        return Collections.unmodifiableMap(cargoManifest);
+        Map<CargoItem, Integer> temporaryMap;
+
+        temporaryMap = cargoManifestLine.stream()
+                .collect(Collectors.toMap(
+                        CargoManifestEntry::getCargoItem,
+                        CargoManifestEntry::getQuantity,
+                        Integer::sum,
+                        LinkedHashMap::new
+                ));
+
+        return Collections.unmodifiableMap(new LinkedHashMap<>(temporaryMap));
     }
 
     public void printCargoManifest() {
         System.out.printf("[INSPECTION] Here is the cargo manifest for the ship '%s' %n", this.getName());
-        System.out.println("[LOGISTICS] Cargo contents: " + cargoManifest);
+        System.out.println("[LOGISTICS] Cargo contents: " + getCargoManifest());
     }
 }

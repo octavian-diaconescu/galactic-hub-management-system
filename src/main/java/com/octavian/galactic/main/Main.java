@@ -7,10 +7,11 @@ import com.octavian.galactic.model.spaceship.*;
 import com.octavian.galactic.model.station.*;
 import com.octavian.galactic.service.*;
 import com.octavian.galactic.model.mission.*;
+import io.github.cdimascio.dotenv.Dotenv;
+import jakarta.persistence.EntityManagerFactory;
+import jakarta.persistence.Persistence;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Scanner;
+import java.util.*;
 
 public class Main {
     private static final Scanner scanner = new Scanner(System.in);
@@ -18,9 +19,44 @@ public class Main {
     private static final HubService hub = new HubService("Omega Station", fuelDepot);
     private static final List<SpaceShip> knownShips = new ArrayList<>();
 
+    private static final String PERSISTENCE_UNIT = "com.octavian.galactic";
+
+
     public static void main(String[] args) {
+        EntityManagerFactory emf = createEntityManagerFactory();
+        try{
         initializeStation();
         runMenu();
+        }finally{
+            if(emf != null && emf.isOpen()){
+                emf.close();
+            }
+        }
+    }
+
+    private static Dotenv loadDotenv(){
+        return Dotenv.configure()
+                .directory("./")
+                .filename(".env.persistence")
+                .load();
+    }
+
+    private static EntityManagerFactory createEntityManagerFactory() {
+        Dotenv dotenv = loadDotenv();
+
+        Map<String, Object> overrides = new HashMap<>();
+        overrides.put("jakarta.persistence.jdbc.user", required(dotenv, "GALACTIC_DB_USER"));
+        overrides.put("jakarta.persistence.jdbc.password", required(dotenv, "GALACTIC_DB_PASSWORD"));
+
+        return Persistence.createEntityManagerFactory(PERSISTENCE_UNIT, overrides);
+    }
+
+    private static String required(Dotenv dotenv, String key){
+        String value = dotenv.get(key);
+        if(value == null || value.isBlank()){
+            throw new IllegalArgumentException("Missing or empty .env entry: " + key);
+        }
+        return value;
     }
 
     private static void initializeStation() {

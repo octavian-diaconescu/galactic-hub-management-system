@@ -16,9 +16,8 @@ public class DockingBay extends SpaceEntity {
     @Column(name = "is_occupied", nullable = false)
     private boolean isOccupied;
 
-    @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "spaceship_id", unique = true)
-    @Column(nullable = true)
     private SpaceShip spaceShip; // Can be null if the respective bay is empty
 
     protected DockingBay() {}
