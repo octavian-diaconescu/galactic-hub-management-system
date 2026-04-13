@@ -119,12 +119,12 @@ public class HubService {
             return;
         }
 
-        dockingBays.entrySet()
+        dockingBays.values()
                 .stream()
-                .filter(entry -> entry.getValue().isOccupied() && entry.getValue().getSpaceShip().getId().equals(id))
+                .filter(entry -> entry.isOccupied() && entry.getSpaceShip().getId().equals(id))
                 .findFirst()
                 .ifPresentOrElse(
-                        bayEntry -> bayEntry.getValue().undockSpaceShip(),
+                        DockingBay::undockSpaceShip,
                         () -> {
                             throw new ShipNotFoundException(id);
                         }
@@ -137,12 +137,12 @@ public class HubService {
             throw new IllegalArgumentException("[HUB] Error: Crew cannot be null");
         }
 
-        dockingBays.entrySet()
+        dockingBays.values()
                 .stream()
-                .filter(entry -> entry.getValue().isOccupied() && entry.getValue().getSpaceShip().getId().equals(id))
+                .filter(entry -> entry.isOccupied() && entry.getSpaceShip().getId().equals(id))
                 .findFirst()
                 .ifPresentOrElse(entry ->
-                                entry.getValue().getSpaceShip().addCrewMember(crew),
+                                entry.getSpaceShip().addCrewMember(crew),
                         () -> {
                             throw new ShipNotFoundException(
                                     "Ship (" + id.toString().substring(0, 8) + ") is not docked — cannot board crew"
@@ -267,7 +267,6 @@ public class HubService {
         switch (dockedShip) {
             case CargoShip _ -> {
                 baseFee = 500.0; // Heavy-duty docking fee
-
                 serviceMultiplier = 1.5; // Commercial surcharge for parts and labor
             }
             case ScoutShip _ -> {
@@ -285,16 +284,16 @@ public class HubService {
         // Calculate final bill for this ship
         double shipTotalBill = baseFee + (resourceCost * serviceMultiplier);
 
-        // Perform the maintenance (State Change)
+        // Perform the maintenance
         if (fuelNeeded > 0) {
             if (fuelDepot.fuelTankIsEmpty()) {
                 System.out.printf("[HUB-BILLING] Warning: depot empty, '%s' could not be refueled%n",
                         dockedShip.getName());
-                fuelNeeded = 0; // no fuel dispensed, don't bill for it
+                fuelNeeded = 0; // No fuel dispensed, don't bill for it
             } else {
                 int dispensable = Math.min(fuelNeeded, fuelDepot.getFuelLevel());
                 fuelDepot.dispenseFuel(dockedShip, dispensable);
-                fuelNeeded = dispensable; // bill only for what was actually dispensed
+                fuelNeeded = dispensable; // Bill only for what was actually dispensed
             }
         }
         if (repairsNeeded > 0) dockedShip.setHullIntegrity(100);

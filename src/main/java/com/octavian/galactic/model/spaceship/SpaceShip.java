@@ -144,6 +144,7 @@ public abstract class SpaceShip extends SpaceEntity implements Fuellable {
         // Finally, add the crew member
         if (this.crewMembers.add(crew)) {
             System.out.printf("[MANIFEST] Welcome aboard '%s', %s!%n", this.getName(), crew.getName());
+            crew.setShip(this);
         } else {
             System.out.printf("[MANIFEST] '%s' is already registered on this ship.%n", crew.getName());
         }

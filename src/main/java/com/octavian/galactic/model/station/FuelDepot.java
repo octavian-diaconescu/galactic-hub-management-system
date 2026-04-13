@@ -24,7 +24,7 @@ public class FuelDepot extends SpaceEntity implements Fuellable {
             throw new InsufficientFuelException(this.getName(), amount, fuelLevel);
 
         fuelLevel -= amount;
-        ship.setFuelLevel(ship.getFuelLevel() + amount);
+        ship.refuel(amount);
         System.out.printf("[DEPOT] '%s' dispensed %d units to '%s'. Depot reserve: %d/%d%n",
                 this.getName(), amount, ship.getName(), fuelLevel, fuelCapacity);
     }
