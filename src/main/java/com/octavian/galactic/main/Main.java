@@ -2,11 +2,15 @@ package com.octavian.galactic.main;
 
 import com.octavian.galactic.exception.InsufficientContainmentException;
 import com.octavian.galactic.model.Size;
-import com.octavian.galactic.model.cargo.HazardousCargo;
+import com.octavian.galactic.model.cargo.*;
+import com.octavian.galactic.model.mission.Mission;
+import com.octavian.galactic.model.mission.MissionType;
 import com.octavian.galactic.model.spaceship.*;
 import com.octavian.galactic.model.station.*;
+import com.octavian.galactic.repository.CargoRepository;
+import com.octavian.galactic.repository.DockingBayRepository;
+import com.octavian.galactic.repository.ShipRepository;
 import com.octavian.galactic.service.*;
-import com.octavian.galactic.model.mission.*;
 import io.github.cdimascio.dotenv.Dotenv;
 import jakarta.persistence.EntityManagerFactory;
 import jakarta.persistence.Persistence;
@@ -16,25 +20,34 @@ import java.util.*;
 public class Main {
     private static final Scanner scanner = new Scanner(System.in);
     private static final FuelDepot fuelDepot = new FuelDepot("Omega F-Depot", 10000, 8000);
-    private static final HubService hub = new HubService("Omega Station", fuelDepot);
-    private static final List<SpaceShip> knownShips = new ArrayList<>();
+    private static HubService hub;
+    private static List<SpaceShip> knownShips = new ArrayList<>();
+    private static List<DockingBay> knownBays = new ArrayList<>();
+
+    private static final EntityManagerFactory emf = createEntityManagerFactory();
+    private static final DockingBayRepository dockingRepository = new DockingBayRepository(emf);
+    private static final ShipRepository shipRepository = new ShipRepository(emf);
+    private static final CargoRepository cargoRepository = new CargoRepository(emf);
 
     private static final String PERSISTENCE_UNIT = "com.octavian.galactic";
 
 
-    public static void main(String[] args) {
-        EntityManagerFactory emf = createEntityManagerFactory();
-        try{
-        initializeStation();
-        runMenu();
-        }finally{
-            if(emf != null && emf.isOpen()){
+    static void main(String[] args) {
+        try {
+            hub = new HubService("Omega Station", fuelDepot, shipRepository, dockingRepository);
+            knownShips = shipRepository.findAll();
+            knownBays = dockingRepository.findAll();
+
+            initializeStation();
+            runMenu();
+        } finally {
+            if (emf != null && emf.isOpen()) {
                 emf.close();
             }
         }
     }
 
-    private static Dotenv loadDotenv(){
+    private static Dotenv loadDotenv() {
         return Dotenv.configure()
                 .directory("./")
                 .filename(".env.persistence")
@@ -51,9 +64,9 @@ public class Main {
         return Persistence.createEntityManagerFactory(PERSISTENCE_UNIT, overrides);
     }
 
-    private static String required(Dotenv dotenv, String key){
+    private static String required(Dotenv dotenv, String key) {
         String value = dotenv.get(key);
-        if(value == null || value.isBlank()){
+        if (value == null || value.isBlank()) {
             throw new IllegalArgumentException("Missing or empty .env entry: " + key);
         }
         return value;
@@ -63,9 +76,11 @@ public class Main {
         System.out.println("Initializing " + hub.getName() + "...");
 
         // Build Bays
-        hub.buildDockingBay(new DockingBay("Aero-Dock-Small", Size.SMALL, false));
-        hub.buildDockingBay(new DockingBay("Commercial-Medium", Size.MEDIUM, false));
-        hub.buildDockingBay(new DockingBay("Heavy-Hauler-Large", Size.LARGE, false));
+        if (knownBays.isEmpty()) {
+            System.out.println("No existing data found. Seeding initial station...");
+            hub.buildDockingBay(new DockingBay("Aero-Dock-Small", Size.SMALL, false));
+            hub.buildDockingBay(new DockingBay("Commercial-Medium", Size.MEDIUM, false));
+            hub.buildDockingBay(new DockingBay("Heavy-Hauler-Large", Size.LARGE, false));
 
         // Create Ships (with missing fuel/hull for billing demonstration)
         CargoShip freighter = new CargoShip.Builder("USG Ishimura", Size.LARGE)
@@ -76,7 +91,10 @@ public class Main {
                 .build();
         freighter.addCrewMember(new CrewMember("Isaac Clarke", CrewMember.Rank.ENGINEER, CrewMember.Species.HUMAN));
         try {
-            freighter.addCargoItem(new HazardousCargo("Marker Fragment", 50.0, 100, "Lead-lined", "Highly volatile alien artifact"), 1);
+            CargoItem cargo = new HazardousCargo("Marker Fragment", 50.0, 100, "Lead-lined", "Highly volatile alien artifact");
+            freighter.addCargoItem(cargo, 1);
+
+            cargoRepository.save(cargo);
         } catch (InsufficientContainmentException i) {
             System.out.println(i.getMessage());
         }
@@ -94,6 +112,11 @@ public class Main {
         hub.registerShip(fighter);
         knownShips.add(freighter);
         knownShips.add(fighter);
+        }
+        else{
+            System.out.println("Loaded " + knownBays.size() + " docking bays from database.");
+            System.out.println("Loaded " + knownShips.size() + " ships from database.");
+        }
 
         System.out.println("Initialization complete. Welcome to the Hub.\n");
     }
@@ -194,7 +217,7 @@ public class Main {
         boolean isOccupied = true;
         List<DockingBay> occupiedBays = hub.getBaysByStatus(isOccupied);
         List<SpaceShip> dockedShips = new ArrayList<>();
-        if(occupiedBays.isEmpty()){
+        if (occupiedBays.isEmpty()) {
             return;
         }
 
@@ -231,6 +254,11 @@ public class Main {
                 case 3 -> MissionType.HAUL;
                 default -> throw new IllegalArgumentException("Invalid mission type");
             };
+
+            if (type == MissionType.HAUL) {
+                selectedShip = shipRepository.findByIdWithCargo(selectedShip.getId())
+                        .orElse(selectedShip);
+            }
 
             System.out.print("Enter mission distance (e.g., 500): ");
             int distance = Integer.parseInt(scanner.nextLine());

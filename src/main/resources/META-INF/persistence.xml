@@ -25,7 +25,7 @@
             <property name="jakarta.persistence.jdbc.url"
                       value="jdbc:postgresql://localhost:5432/galactic-hub"/>
 
-            <property name="jakarta.persistence.schema-generation.database.action" value="drop-and-create"/>
+            <property name="jakarta.persistence.schema-generation.database.action" value="create"/>
             <property name="jakarta.persistence.schema-generation.scripts.create-target" value="schema-create.sql"/>
             <property name="jakarta.persistence.schema-generation.scripts.drop-target" value="schema-drop.sql"/>
 

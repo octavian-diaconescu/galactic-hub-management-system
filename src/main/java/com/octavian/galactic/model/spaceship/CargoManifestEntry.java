@@ -10,8 +10,6 @@ import java.util.UUID;
 @Table(name = "cargo_manifest_entry", uniqueConstraints = @UniqueConstraint(columnNames = {"cargo_ship_id", "cargo_item_id"}))
 public class CargoManifestEntry {
     @Id
-    @GeneratedValue
-    @UuidGenerator(style = UuidGenerator.Style.RANDOM)
     @Column(nullable = false, updatable = false, columnDefinition = "uuid")
     private UUID id;
 

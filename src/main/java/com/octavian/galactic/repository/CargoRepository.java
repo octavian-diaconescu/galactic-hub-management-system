@@ -11,7 +11,7 @@ import java.util.UUID;
 public class CargoRepository implements BaseRepository<CargoItem> {
     private final EntityManagerFactory emf;
 
-    CargoRepository(EntityManagerFactory emf) {
+    public CargoRepository(EntityManagerFactory emf) {
         this.emf = emf;
     }
 
@@ -31,37 +31,31 @@ public class CargoRepository implements BaseRepository<CargoItem> {
 
     @Override
     public void save(CargoItem entity) {
-        emf.runInTransaction(em -> {
-            em.getTransaction().begin();
-            em.persist(entity);
-            em.getTransaction().commit();
-        });
+        emf.runInTransaction(em ->
+                em.persist(entity));
     }
 
     @Override
     public void update(CargoItem entity) {
-        emf.runInTransaction(em -> {
-            em.getTransaction().begin();
-            em.merge(entity);
-            em.getTransaction().commit();
-        });
+        emf.runInTransaction(em ->
+                em.merge(entity)
+        );
     }
 
     @Override
     public void delete(CargoItem entity) {
-        emf.runInTransaction(em -> {
-            em.getTransaction().begin();
-            em.remove(entity);
-            em.getTransaction().commit();
-        });
+        emf.runInTransaction(em ->
+                em.remove(em.contains(entity) ? entity : em.merge(entity))
+        );
     }
 
     @Override
     public void deleteById(UUID id) {
-        emf.runInTransaction(em ->{
-           em.getTransaction().begin();
-           em.remove(em.find(CargoItem.class, id));
-           em.getTransaction().commit();
+        emf.runInTransaction(em -> {
+            CargoItem cargoItem = em.find(CargoItem.class, id);
+            if (cargoItem != null) {
+                em.remove(cargoItem);
+            }
         });
     }
 }

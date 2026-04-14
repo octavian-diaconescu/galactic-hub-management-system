@@ -13,6 +13,9 @@ public class DockingBay extends SpaceEntity {
     @Column(name = "bay_size", nullable = false)
     private Size baySize;
 
+    @Column(name = "bay_number", nullable = false)
+    private int bayNumber;
+
     @Column(name = "is_occupied", nullable = false)
     private boolean isOccupied;
 
@@ -26,6 +29,7 @@ public class DockingBay extends SpaceEntity {
         super(name);
         this.baySize = baySize;
         this.isOccupied = isOccupied;
+        this.bayNumber = -1;
     }
 
     public void dockSpaceShip(SpaceShip spaceShip) {
@@ -65,6 +69,14 @@ public class DockingBay extends SpaceEntity {
     // Returns the occupation state
     public boolean isOccupied() {
         return isOccupied;
+    }
+
+    public void setBayNumber(int bayNumber){
+        this.bayNumber = bayNumber;
+    }
+
+    public Integer getBayNumber() {
+        return bayNumber;
     }
 
 //    public void setOccupied(boolean occupied) {

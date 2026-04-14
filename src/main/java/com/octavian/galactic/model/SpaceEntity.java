@@ -1,10 +1,8 @@
 package com.octavian.galactic.model;
 
 import jakarta.persistence.Column;
-import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
 import jakarta.persistence.MappedSuperclass;
-import org.hibernate.annotations.UuidGenerator;
 
 import java.util.Objects;
 import java.util.UUID;
@@ -12,8 +10,6 @@ import java.util.UUID;
 @MappedSuperclass
 public abstract class SpaceEntity {
     @Id
-    @GeneratedValue
-    @UuidGenerator(style = UuidGenerator.Style.RANDOM)
     @Column(nullable = false, updatable = false, columnDefinition = "uuid")
     private UUID id;
 
