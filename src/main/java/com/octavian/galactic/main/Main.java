@@ -21,7 +21,6 @@ public class Main {
     private static final Scanner scanner = new Scanner(System.in);
     private static final FuelDepot fuelDepot = new FuelDepot("Omega F-Depot", 10000, 8000);
     private static HubService hub;
-    private static List<SpaceShip> knownShips = new ArrayList<>();
     private static List<DockingBay> knownBays = new ArrayList<>();
 
     private static final EntityManagerFactory emf = createEntityManagerFactory();
@@ -32,10 +31,9 @@ public class Main {
     private static final String PERSISTENCE_UNIT = "com.octavian.galactic";
 
 
-    static void main(String[] args) {
+    public static void main(String[] args) {
         try {
             hub = new HubService("Omega Station", fuelDepot, shipRepository, dockingRepository);
-            knownShips = shipRepository.findAll();
             knownBays = dockingRepository.findAll();
 
             initializeStation();
@@ -110,12 +108,10 @@ public class Main {
         // Register Ships
         hub.registerShip(freighter);
         hub.registerShip(fighter);
-        knownShips.add(freighter);
-        knownShips.add(fighter);
         }
         else{
             System.out.println("Loaded " + knownBays.size() + " docking bays from database.");
-            System.out.println("Loaded " + knownShips.size() + " ships from database.");
+            System.out.println("Loaded " + shipRepository.findAll().size() + " ships from database.");
         }
 
         System.out.println("Initialization complete. Welcome to the Hub.\n");
@@ -168,9 +164,10 @@ public class Main {
     }
 
     private static void handleDocking() {
+        List<SpaceShip> ships = shipRepository.findAll();
         System.out.println("\n--- INCOMING SHIPS ---");
-        for (int i = 0; i < knownShips.size(); i++) {
-            System.out.printf("%d. %s [%s]%n", i + 1, knownShips.get(i).getName(), knownShips.get(i).getShipSize());
+        for (int i = 0; i < ships.size(); i++) {
+            System.out.printf("%d. %s [%s]%n", i + 1, ships.get(i).getName(), ships.get(i).getShipSize());
         }
         System.out.print("Select a ship to dock (enter number): ");
         try {
@@ -179,8 +176,8 @@ public class Main {
             System.out.print("Select a bay number to dock in: ");
             int bayChoice = Integer.parseInt(scanner.nextLine());
 
-            if (shipChoice >= 0 && shipChoice < knownShips.size()) {
-                SpaceShip selectedShip = knownShips.get(shipChoice);
+            if (shipChoice >= 0 && shipChoice < ships.size()) {
+                SpaceShip selectedShip = ships.get(shipChoice);
                 hub.assignShipToBay(selectedShip.getId(), bayChoice);
             } else {
                 System.out.println("Invalid ship selection.");
@@ -231,18 +228,20 @@ public class Main {
     }
 
     private static void handleMissionDispatch() {
+        List<SpaceShip> ships = shipRepository.findAll();
+
         System.out.println("\n--- MISSION BOARD ---");
-        for (int i = 0; i < knownShips.size(); i++) {
-            System.out.printf("[%s] %d. %s (Fuel: %d%%)%n", knownShips.get(i).getClass().getSimpleName(), i + 1, knownShips.get(i).getName(), knownShips.get(i).getFuelLevel());
+        for (int i = 0; i < ships.size(); i++) {
+            System.out.printf("[%s] %d. %s (Fuel: %d%%)%n", ships.get(i).getClass().getSimpleName(), i + 1, ships.get(i).getName(), ships.get(i).getFuelLevel());
         }
         System.out.print("Select a ship to dispatch (enter number): ");
         try {
             int shipChoice = Integer.parseInt(scanner.nextLine()) - 1;
-            if (shipChoice < 0 || shipChoice >= knownShips.size()) {
+            if (shipChoice < 0 || shipChoice >= ships.size()) {
                 System.out.println("Invalid selection.");
                 return;
             }
-            SpaceShip selectedShip = knownShips.get(shipChoice);
+            SpaceShip selectedShip = ships.get(shipChoice);
 
             System.out.println("Available Mission Types: 1. PATROL  2. EXPLORE  3. HAUL");
             System.out.print("Select mission type: ");
@@ -265,6 +264,7 @@ public class Main {
 
             Mission mission = new Mission("Sector " + (int) (Math.random() * 100) + " Operation", type, distance, 1500.0);
             MissionDispatcher.dispatch(selectedShip, mission);
+            shipRepository.update(selectedShip);
 
         } catch (NumberFormatException e) {
             System.out.println("Invalid input. Please enter a valid number.");

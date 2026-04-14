@@ -4,13 +4,8 @@ import com.octavian.galactic.exception.DockingBayNotFoundException;
 import com.octavian.galactic.exception.ShipNotFoundException;
 import com.octavian.galactic.model.cargo.CargoItem;
 import com.octavian.galactic.model.cargo.HazardousCargo;
-import com.octavian.galactic.model.spaceship.CargoShip;
-import com.octavian.galactic.model.spaceship.FighterShip;
-import com.octavian.galactic.model.spaceship.ScoutShip;
-import com.octavian.galactic.model.spaceship.SpaceShip;
-import com.octavian.galactic.model.station.CrewMember;
-import com.octavian.galactic.model.station.DockingBay;
-import com.octavian.galactic.model.station.FuelDepot;
+import com.octavian.galactic.model.spaceship.*;
+import com.octavian.galactic.model.station.*;
 import com.octavian.galactic.repository.DockingBayRepository;
 import com.octavian.galactic.repository.ShipRepository;
 
@@ -49,6 +44,7 @@ public class HubService {
 
         registeredShips = getPersistedShips();
         dockingBays = getPersistedBays();
+        dockingBayNumber = dockingBays.keySet().stream().max(Integer::compareTo).orElse(0);
     }
 
     public String getName() {
@@ -56,10 +52,12 @@ public class HubService {
     }
 
     public List<SpaceShip> getRegisteredShips() {
+        registeredShips = getPersistedShips();
         return Collections.unmodifiableList(registeredShips);
     }
 
     public Map<Integer, DockingBay> getDockingBays() {
+        dockingBays = getPersistedBays();
         return Collections.unmodifiableMap(dockingBays);
     }
 
@@ -150,6 +148,9 @@ public class HubService {
     }
 
     public void assignShipToBay(UUID id, int bayNumber) {
+        dockingBays = getPersistedBays();
+        registeredShips = getPersistedShips();
+
         DockingBay bay = dockingBays.get(bayNumber);
         if (bay == null) {
             throw new DockingBayNotFoundException(bayNumber);
@@ -172,6 +173,7 @@ public class HubService {
                                     }
                                 } catch (IllegalStateException e) {
                                     System.out.println("[HUB] Error: " + e.getMessage());
+                                    return;
                                 }
                                 System.out.printf("[HUB] Success: '%s' parked in bay %d%n", ship.getName(), bayNumber);
                             } else {
@@ -185,6 +187,9 @@ public class HubService {
     }
 
     public void unassignShipFromBay(UUID id) {
+        dockingBays = getPersistedBays();
+        registeredShips = getPersistedShips();
+
         if (dockingBays.isEmpty()) {
             System.out.println("[HUB] Error: No docking bays found.");
             return;
@@ -209,6 +214,9 @@ public class HubService {
 
     // Searches ship by UUID
     public void onboardCrewToShip(UUID id, CrewMember crew) {
+        dockingBays = getPersistedBays();
+        registeredShips = getPersistedShips();
+
         if (crew == null) {
             throw new IllegalArgumentException("[HUB] Error: Crew cannot be null");
         }
@@ -414,6 +422,9 @@ public class HubService {
                 SpaceShip ship = bay.getSpaceShip();
 
                 totalRevenue += calculateDockingFeesPerShip(ship.getId());
+                if (shipRepository != null) {
+                    shipRepository.update(ship);
+                }
             }
         }
 

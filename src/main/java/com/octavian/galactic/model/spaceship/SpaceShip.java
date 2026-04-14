@@ -2,14 +2,14 @@ package com.octavian.galactic.model.spaceship;
 
 import com.octavian.galactic.exception.CrewCapacityExceededException;
 import com.octavian.galactic.model.Fuellable;
+import com.octavian.galactic.model.Size;
 import com.octavian.galactic.model.SpaceEntity;
 import com.octavian.galactic.model.station.CrewMember;
-import com.octavian.galactic.model.Size;
 import jakarta.persistence.*;
 
+import java.util.Collections;
 import java.util.Set;
 import java.util.TreeSet;
-import java.util.Collections;
 import java.util.UUID;
 
 @Entity
@@ -34,10 +34,10 @@ public abstract class SpaceShip extends SpaceEntity implements Fuellable {
     @Column(name = "size", nullable = false)
     private Size shipSize;
 
-    @OneToMany(mappedBy = "ship", cascade = CascadeType.ALL,  orphanRemoval = true)
+    @OneToMany(mappedBy = "ship", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<CrewMember> crewMembers = new TreeSet<>();
 
-    protected SpaceShip(){}
+    protected SpaceShip() {}
 
     protected SpaceShip(AbstractBuilder<?> builder) {
         super(builder.name);
@@ -119,7 +119,8 @@ public abstract class SpaceShip extends SpaceEntity implements Fuellable {
 
     @Override
     public void refuel(int amount) {
-        this.fuelLevel += amount;
+        if (amount <= 0) throw new IllegalArgumentException("Amount must be positive");
+        setFuelLevel(Math.min(fuelLevel + amount, 100));
     }
 
     public int getHullIntegrity() {
@@ -155,7 +156,7 @@ public abstract class SpaceShip extends SpaceEntity implements Fuellable {
         crewMembers.stream()
                 .filter(c -> c.getId().equals(crewID))
                 .findFirst()
-                .ifPresent(crew ->{
+                .ifPresent(crew -> {
                     crewMembers.remove(crew);
                     crew.setShip(null);
                 });

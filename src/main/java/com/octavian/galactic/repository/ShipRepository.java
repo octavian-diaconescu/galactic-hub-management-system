@@ -69,24 +69,24 @@ public class ShipRepository implements BaseRepository<SpaceShip> {
 
     @Override
     public void save(SpaceShip entity) {
-        emf.runInTransaction(em -> {
-            em.persist(entity);
-        });
+        emf.runInTransaction(em ->
+                em.persist(entity)
+        );
     }
 
     @Override
     public void update(SpaceShip entity) {
-        emf.runInTransaction(em -> {
-            em.merge(entity);
-        });
+        emf.runInTransaction(em ->
+                em.merge(entity)
+        );
     }
 
 
     @Override
     public void delete(SpaceShip entity) {
-        emf.runInTransaction(em -> {
-            em.remove(em.contains(entity) ? entity : em.merge(entity));
-        });
+        emf.runInTransaction(em ->
+                em.remove(em.contains(entity) ? entity : em.merge(entity))
+        );
     }
 
     @Override
