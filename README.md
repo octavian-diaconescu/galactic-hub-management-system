@@ -38,6 +38,11 @@ Status guide:
 - [x] PostgreSQL-backed persistence for ships, bays, and cargo
 - [x] Unit and integration tests (including Testcontainers-based DB integration tests)
 
+### TODO's
+- [ ] AgriculturalCargo.java, ManufacturedCargo.java, RawMaterialCargo.java need concrete usages. Right now no object of those types are used in the project
+- [ ] Finish game logic
+- [ ] SpaceShip.java --> calculateFuelCost(int distance): refactor for ship sizes AND different ship types
+
 ## Architecture At A Glance
 
 The project is organized around a clear layered flow:
