@@ -5,6 +5,7 @@ import com.octavian.galactic.model.Fuellable;
 import com.octavian.galactic.model.SpaceEntity;
 import com.octavian.galactic.model.spaceship.SpaceShip;
 
+//TODO: persist FuelDepot class
 public class FuelDepot extends SpaceEntity implements Fuellable {
     private int fuelLevel;
     private final int fuelCapacity;
