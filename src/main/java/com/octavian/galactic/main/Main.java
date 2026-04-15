@@ -124,28 +124,32 @@ public class Main {
             System.out.println("\n=========================================");
             System.out.println("   " + hub.getName().toUpperCase() + " TERMINAL");
             System.out.println("=========================================");
-            System.out.println("1. View Station Status (Bays)");
-            System.out.println("2. Dock a Ship");
-            System.out.println("3. Undock a Ship");
-            System.out.println("4. Scan Docked Ships for Hazards");
-            System.out.println("5. Generate Personnel Report");
-            System.out.println("6. Run End-of-Day Billing");
-            System.out.println("7. Trigger Emergency Evacuation");
-            System.out.println("8. Dispatch Ship on Mission");
-            System.out.println("0. Exit Terminal");
+            System.out.println(" 1. View Station Status (Bays)");
+            System.out.println(" 2. View Docked Ship Stats");
+            System.out.println(" 3. Dock a Ship");
+            System.out.println(" 4. Undock a Ship");
+            System.out.println(" 5. Scan Docked Ships for Hazards");
+            System.out.println(" 6. Find Heaviest Cargo Ship");
+            System.out.println(" 7. Generate Docked Personnel Report");
+            System.out.println(" 8. Run End-of-Day Billing");
+            System.out.println(" 9. Dispatch Ship on Mission");
+            System.out.println("10. Trigger Emergency Evacuation");
+            System.out.println(" 0. Exit Terminal");
             System.out.print("Select an option: ");
 
-            String input = scanner.nextLine();
+            String input = scanner.nextLine().strip();
 
             switch (input) {
-                case "1" -> viewStationStatus();
-                case "2" -> handleDocking();
-                case "3" -> handleUndocking();
-                case "4" -> handleHazardScan();
-                case "5" -> hub.generatePersonnelReport();
-                case "6" -> hub.calculateTotalDockingFees();
-                case "7" -> hub.emergencyEvacuation();
-                case "8" -> handleMissionDispatch();
+                case "1" -> { viewStationStatus(); waitForEnter(); }
+                case "2" -> { viewDockedShipStats(); waitForEnter(); }
+                case "3" -> { handleDocking(); waitForEnter(); }
+                case "4" -> { handleUndocking(); waitForEnter(); }
+                case "5" -> { handleHazardScan(); waitForEnter(); }
+                case "6" -> { handleFindHeaviestCargo(); waitForEnter(); }
+                case "7" -> { handlePersonnelReport(); waitForEnter(); }
+                case "8" -> { hub.calculateTotalDockingFees(); waitForEnter(); }
+                case "9" -> { handleMissionDispatch(); waitForEnter(); }
+                case "10" -> { hub.emergencyEvacuation(); waitForEnter(); }
                 case "0" -> {
                     System.out.println("Shutting down terminal. Goodbye.");
                     running = false;
@@ -153,6 +157,11 @@ public class Main {
                 default -> System.out.println("Invalid input. Please try again.");
             }
         }
+    }
+
+    private static void waitForEnter() {
+        System.out.print("\nPress Enter to continue...");
+        scanner.nextLine();
     }
 
     private static void viewStationStatus() {
@@ -164,24 +173,49 @@ public class Main {
     }
 
     private static void handleDocking() {
-        List<SpaceShip> ships = shipRepository.findAll();
+        Set<UUID> dockedShipIds = hub.getBaysByStatus(true).stream()
+                .map(DockingBay::getSpaceShip)
+                .filter(Objects::nonNull)
+                .map(SpaceShip::getId)
+                .collect(HashSet::new, HashSet::add, HashSet::addAll);
+
+        List<SpaceShip> ships = shipRepository.findAll().stream()
+                .filter(s -> !dockedShipIds.contains(s.getId()))
+                .toList();
+
         System.out.println("\n--- INCOMING SHIPS ---");
+        if (ships.isEmpty()) {
+            System.out.println("No ships are waiting to dock.");
+            return;
+        }
         for (int i = 0; i < ships.size(); i++) {
             System.out.printf("%d. %s [%s]%n", i + 1, ships.get(i).getName(), ships.get(i).getShipSize());
         }
-        System.out.print("Select a ship to dock (enter number): ");
+
+        System.out.println("\n--- AVAILABLE BAYS ---");
+        List<Map.Entry<Integer, DockingBay>> emptyBays = hub.getDockingBays().entrySet().stream()
+                .filter(e -> !e.getValue().isOccupied())
+                .toList();
+        if (emptyBays.isEmpty()) {
+            System.out.println("No empty bays available.");
+            return;
+        }
+        emptyBays.forEach(e ->
+                System.out.printf("Bay %d: %s [%s]%n", e.getKey(), e.getValue().getName(), e.getValue().getBaySize()));
+
+        System.out.print("\nSelect a ship to dock (enter number): ");
         try {
             int shipChoice = Integer.parseInt(scanner.nextLine()) - 1;
+            if (shipChoice < 0 || shipChoice >= ships.size()) {
+                System.out.println("Invalid ship selection.");
+                return;
+            }
 
             System.out.print("Select a bay number to dock in: ");
             int bayChoice = Integer.parseInt(scanner.nextLine());
 
-            if (shipChoice >= 0 && shipChoice < ships.size()) {
-                SpaceShip selectedShip = ships.get(shipChoice);
-                hub.assignShipToBay(selectedShip.getId(), bayChoice);
-            } else {
-                System.out.println("Invalid ship selection.");
-            }
+            SpaceShip selectedShip = ships.get(shipChoice);
+            hub.assignShipToBay(selectedShip.getId(), bayChoice);
         } catch (NumberFormatException e) {
             System.out.println("Invalid input. Please enter a valid number.");
         } catch (Exception e) {
@@ -228,20 +262,30 @@ public class Main {
     }
 
     private static void handleMissionDispatch() {
-        List<SpaceShip> ships = shipRepository.findAll();
+        List<DockingBay> occupiedBays = hub.getBaysByStatus(true);
+        if (occupiedBays.isEmpty()) {
+            System.out.println("No ships are currently docked to dispatch.");
+            return;
+        }
+
+        List<SpaceShip> dockedShips = occupiedBays.stream()
+                .map(DockingBay::getSpaceShip)
+                .toList();
 
         System.out.println("\n--- MISSION BOARD ---");
-        for (int i = 0; i < ships.size(); i++) {
-            System.out.printf("[%s] %d. %s (Fuel: %d%%)%n", ships.get(i).getClass().getSimpleName(), i + 1, ships.get(i).getName(), ships.get(i).getFuelLevel());
+        for (int i = 0; i < dockedShips.size(); i++) {
+            SpaceShip s = dockedShips.get(i);
+            System.out.printf("[%s] %d. %s (Fuel: %d%%, Hull: %d%%)%n",
+                    s.getClass().getSimpleName(), i + 1, s.getName(), s.getFuelLevel(), s.getHullIntegrity());
         }
         System.out.print("Select a ship to dispatch (enter number): ");
         try {
             int shipChoice = Integer.parseInt(scanner.nextLine()) - 1;
-            if (shipChoice < 0 || shipChoice >= ships.size()) {
+            if (shipChoice < 0 || shipChoice >= dockedShips.size()) {
                 System.out.println("Invalid selection.");
                 return;
             }
-            SpaceShip selectedShip = ships.get(shipChoice);
+            SpaceShip selectedShip = dockedShips.get(shipChoice);
 
             System.out.println("Available Mission Types: 1. PATROL  2. EXPLORE  3. HAUL");
             System.out.print("Select mission type: ");
@@ -265,11 +309,91 @@ public class Main {
             Mission mission = new Mission("Sector " + (int) (Math.random() * 100) + " Operation", type, distance, 1500.0);
             MissionDispatcher.dispatch(selectedShip, mission);
             shipRepository.update(selectedShip);
+            hub.unassignShipFromBay(selectedShip.getId());
 
         } catch (NumberFormatException e) {
             System.out.println("Invalid input. Please enter a valid number.");
         } catch (IllegalStateException | IllegalArgumentException e) {
             System.out.println("Mission Aborted: " + e.getMessage());
+        }
+    }
+
+    private static void handlePersonnelReport() {
+        List<DockingBay> occupiedBays = hub.getBaysByStatus(true);
+        if (occupiedBays.isEmpty()) {
+            System.out.println("No docked ships — no personnel to report.");
+            return;
+        }
+
+        Set<CrewMember> personnel = new TreeSet<>();
+        for (DockingBay bay : occupiedBays) {
+            personnel.addAll(bay.getSpaceShip().getCrewMembers());
+        }
+
+        if (personnel.isEmpty()) {
+            System.out.println("[HUB] Docked ships have no crew on board.");
+            return;
+        }
+
+        System.out.println("\n--- DOCKED PERSONNEL REPORT ---");
+        for (CrewMember crew : personnel) {
+            System.out.printf("  - %s [%s]%n", crew, crew.getSpecies());
+        }
+        System.out.printf("Total personnel on station: %d%n", personnel.size());
+    }
+
+    private static void viewDockedShipStats() {
+        List<DockingBay> occupiedBays = hub.getBaysByStatus(true);
+        if (occupiedBays.isEmpty()) {
+            System.out.println("No ships are currently docked.");
+            return;
+        }
+
+        System.out.println("\n--- DOCKED SHIP STATS ---");
+        for (DockingBay bay : occupiedBays) {
+            SpaceShip ship = bay.getSpaceShip();
+            System.out.println("-----------------------------------------");
+            System.out.printf("Bay %d: %s%n", bay.getBayNumber(), bay.getName());
+            System.out.printf("  Ship:      %s (%s)%n", ship.getName(), ship.getClass().getSimpleName());
+            System.out.printf("  Size:      %s%n", ship.getShipSize());
+            System.out.printf("  Fuel:      %d%%%n", ship.getFuelLevel());
+            System.out.printf("  Hull:      %d%%%n", ship.getHullIntegrity());
+            System.out.printf("  Crew (%d): %s%n", ship.getCrewMembers().size(), ship.getCrewMembers());
+
+            if (ship instanceof CargoShip) {
+                CargoShip cargoShip = shipRepository.findByIdWithCargo(ship.getId())
+                        .filter(CargoShip.class::isInstance)
+                        .map(CargoShip.class::cast)
+                        .orElse((CargoShip) ship);
+                Map<CargoItem, Integer> manifest = cargoShip.getCargoManifest();
+                if (manifest.isEmpty()) {
+                    System.out.println("  Cargo:     [empty]");
+                } else {
+                    System.out.println("  Cargo:");
+                    manifest.forEach((item, qty) ->
+                            System.out.printf("    - %s x%d (%.1f kg each)%n", item.getName(), qty, item.getWeight()));
+                }
+            }
+        }
+        System.out.println("-----------------------------------------");
+    }
+
+    private static void handleFindHeaviestCargo() {
+        System.out.println("\n--- HEAVIEST CARGO SHIP ---");
+        System.out.println("Search scope: 1. Docked  2. All Time");
+        System.out.print("Select: ");
+        try {
+            int choice = Integer.parseInt(scanner.nextLine());
+            String filter = switch (choice) {
+                case 1 -> "docked";
+                case 2 -> "all time";
+                default -> throw new IllegalArgumentException("Invalid filter choice");
+            };
+            hub.findHeaviestCargoShip(filter);
+        } catch (NumberFormatException e) {
+            System.out.println("Invalid input. Please enter a valid number.");
+        } catch (IllegalArgumentException e) {
+            System.out.println("Error: " + e.getMessage());
         }
     }
 }
