@@ -4,10 +4,13 @@ import com.octavian.galactic.model.mission.Mission;
 import com.octavian.galactic.model.mission.MissionResult;
 import com.octavian.galactic.model.mission.SpaceEvent;
 import com.octavian.galactic.model.spaceship.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.Random;
 
 public class MissionDispatcher {
+    private static final Logger logger = LoggerFactory.getLogger(MissionDispatcher.class);
     private static final Random random = new Random();
 
     // Event probability weights [CLEAR, PIRATE, NEBULA, DEBRIS, DERELICT]
@@ -20,9 +23,12 @@ public class MissionDispatcher {
         // Inside this validation function we also check if the ship has enough fuel to be dispatched
         // This accounts only for a one-way trip
         validateDispatch(ship, mission);
+        logger.info("[MISSION] Dispatching '{}' on {} mission '{}' (distance: {})",
+                ship.getName(), mission.type(), mission.name(), mission.distance());
 
         int fuelCost = ship.calculateFuelCost(mission.distance());
         SpaceEvent event = rollEvent();
+        logger.debug("[MISSION] Event rolled for '{}': {}", ship.getName(), event);
 
         MissionResult result = switch (mission.type()) {
             case PATROL -> handlePatrol(ship, mission, event, fuelCost);
@@ -32,6 +38,11 @@ public class MissionDispatcher {
 
         applyResult(ship, result);
         result.printSummary();
+
+        AuditService.log(AuditService.Action.MISSION_DISPATCHED, ship.getName(),
+                mission.type() + " | " + (result.isSuccess() ? "SUCCESS" : "FAILED"));
+        logger.info("[MISSION] '{}' completed mission '{}' — {}",
+                ship.getName(), mission.name(), result.isSuccess() ? "SUCCESS" : "FAILED");
         return result;
     }
 
@@ -194,6 +205,8 @@ public class MissionDispatcher {
         int fuelCost = ship.calculateFuelCost(mission.distance());
 
         if (ship.getFuelLevel() < fuelCost) {
+            logger.warn("[MISSION] '{}' has insufficient fuel for mission '{}'. Needs {}, has {}",
+                    ship.getName(), mission.name(), fuelCost, ship.getFuelLevel());
             throw new IllegalStateException(String.format(
                     "'%s' has insufficient fuel for this mission. Needs %d, has %d",
                     ship.getName(), fuelCost, ship.getFuelLevel()));

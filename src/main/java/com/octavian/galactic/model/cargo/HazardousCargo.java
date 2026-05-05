@@ -61,15 +61,16 @@ public class HazardousCargo extends CargoItem {
         return radiationLevel >= DANGEROUS_RADIATION_THRESHOLD;
     }
 
+    @SuppressWarnings("BooleanMethodIsAlwaysInverted")
     public boolean isContainmentAdequate() {
         return !isDangerous() || containmentType.equalsIgnoreCase("Lead-lined");
     }
 
     public String getHandlingWarning() {
         if (isDangerous() && !isContainmentAdequate()) {
-            return "CRITICAL: High radiation with inadequate containment — DO NOT LOAD";
+            return "CRITICAL: High radiation with inadequate containment - DO NOT LOAD";
         } else if (isDangerous()) {
-            return "WARNING: High radiation cargo — authorised personnel only";
+            return "WARNING: High radiation cargo - authorised personnel only";
         } else {
             return "LOW RISK: Standard hazardous handling protocols apply";
         }

@@ -6,6 +6,8 @@ import com.octavian.galactic.model.Size;
 import com.octavian.galactic.model.SpaceEntity;
 import com.octavian.galactic.model.station.CrewMember;
 import jakarta.persistence.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.Collections;
 import java.util.Set;
@@ -18,6 +20,8 @@ import java.util.UUID;
 @DiscriminatorColumn(name = "ship_type", discriminatorType = DiscriminatorType.STRING)
 // The base for all flying vehicles
 public abstract class SpaceShip extends SpaceEntity implements Fuellable {
+    private static final Logger logger = LoggerFactory.getLogger(SpaceShip.class);
+
     @Column(name = "fuel_level", nullable = false)
     private int fuelLevel; // 0 to 100 reinforced in the setter function
 
@@ -144,10 +148,10 @@ public abstract class SpaceShip extends SpaceEntity implements Fuellable {
         }
         // Finally, add the crew member
         if (this.crewMembers.add(crew)) {
-            System.out.printf("[MANIFEST] Welcome aboard '%s', %s!%n", this.getName(), crew.getName());
+            logger.info("[MANIFEST] Welcome aboard '{}', {}!", this.getName(), crew.getName());
             crew.setShip(this);
         } else {
-            System.out.printf("[MANIFEST] '%s' is already registered on this ship.%n", crew.getName());
+            logger.warn("[MANIFEST] '{}' is already registered on this ship.", crew.getName());
         }
     }
 
@@ -175,12 +179,14 @@ public abstract class SpaceShip extends SpaceEntity implements Fuellable {
         int fuelCost = calculateFuelCost(distance);
 
         if (fuelLevel < fuelCost) {
-            System.out.printf("[NAV] '%s' cannot travel %d units: needs %d fuel, has %d.%n", this.getName(), distance, fuelCost, fuelLevel);
+            logger.warn("[NAV] '{}' cannot travel {} units: needs {} fuel, has {}.",
+                    this.getName(), distance, fuelCost, fuelLevel);
             return false;
         }
 
         setFuelLevel(fuelLevel - fuelCost);
-        System.out.printf("[NAV] '%s' successfully traveled %d units. Fuel: %d -> %d%n", this.getName(), distance, fuelLevel + fuelCost, fuelLevel);
+        logger.info("[NAV] '{}' successfully traveled {} units. Fuel: {} -> {}",
+                this.getName(), distance, fuelLevel + fuelCost, fuelLevel);
         return true;
     }
 

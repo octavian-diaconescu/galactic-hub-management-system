@@ -4,11 +4,15 @@ import com.octavian.galactic.model.Size;
 import com.octavian.galactic.model.SpaceEntity;
 import com.octavian.galactic.model.spaceship.SpaceShip;
 import jakarta.persistence.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 // A physical location where a ship can park
 @Entity
 @Table(name = "docking_bay")
 public class DockingBay extends SpaceEntity {
+    private static final Logger logger = LoggerFactory.getLogger(DockingBay.class);
+
     @Enumerated(EnumType.STRING)
     @Column(name = "bay_size", nullable = false)
     private Size baySize;
@@ -49,10 +53,10 @@ public class DockingBay extends SpaceEntity {
 
     public void undockSpaceShip() {
         if (!isOccupied || spaceShip == null) {
-            System.out.printf("[BSP] Warning: Attempted to undock from already-empty bay '%s'%n", this.getName());
+            logger.warn("[BSP] Attempted to undock from already-empty bay '{}'", this.getName());
             return;
         }
-        System.out.printf("[BSP] SpaceShip '%s' has been undocked%n", this.spaceShip.getName());
+        logger.info("[BSP] SpaceShip '{}' has been undocked", this.spaceShip.getName());
         this.spaceShip.setDocked(false);
         this.spaceShip = null;
         this.isOccupied = false;

@@ -1,0 +1,24 @@
+<configuration>
+
+    <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>%d{HH:mm:ss} %-5level [%logger{20}] - %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <!-- Suppress your app's INFO logs during tests, only show warnings and above -->
+    <logger name="com.octavian.galactic" level="WARN" additivity="false">
+        <appender-ref ref="CONSOLE"/>
+    </logger>
+
+    <!-- Keep audit logger silent during tests -->
+    <logger name="AUDIT" level="OFF"/>
+
+    <!-- Silence Hibernate entirely -->
+    <logger name="org.hibernate" level="OFF"/>
+
+    <root level="WARN">
+        <appender-ref ref="CONSOLE"/>
+    </root>
+
+</configuration>

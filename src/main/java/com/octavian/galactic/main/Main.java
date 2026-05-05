@@ -14,10 +14,13 @@ import com.octavian.galactic.service.*;
 import io.github.cdimascio.dotenv.Dotenv;
 import jakarta.persistence.EntityManagerFactory;
 import jakarta.persistence.Persistence;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.*;
 
 public class Main {
+    private static final Logger logger = LoggerFactory.getLogger(Main.class);
     private static final Scanner scanner = new Scanner(System.in);
     private static final FuelDepot fuelDepot = new FuelDepot("Omega F-Depot", 10000, 8000);
     private static HubService hub;
@@ -71,10 +74,12 @@ public class Main {
     }
 
     private static void initializeStation() {
+        logger.info("Initializing {}...", hub.getName());
         System.out.println("Initializing " + hub.getName() + "...");
 
         // Build Bays
         if (knownBays.isEmpty()) {
+            logger.info("No existing data found. Seeding initial station...");
             System.out.println("No existing data found. Seeding initial station...");
             hub.buildDockingBay(new DockingBay("Aero-Dock-Small", Size.SMALL, false));
             hub.buildDockingBay(new DockingBay("Commercial-Medium", Size.MEDIUM, false));
@@ -94,6 +99,7 @@ public class Main {
 
             cargoRepository.save(cargo);
         } catch (InsufficientContainmentException i) {
+            logger.error("[INIT] Containment check failed: {}", i.getMessage());
             System.out.println(i.getMessage());
         }
 
@@ -110,10 +116,14 @@ public class Main {
         hub.registerShip(fighter);
         }
         else{
+            logger.info("Loaded {} docking bays from database.", knownBays.size());
             System.out.println("Loaded " + knownBays.size() + " docking bays from database.");
-            System.out.println("Loaded " + shipRepository.findAll().size() + " ships from database.");
+            int shipCount = shipRepository.findAll().size();
+            logger.info("Loaded {} ships from database.", shipCount);
+            System.out.println("Loaded " + shipCount + " ships from database.");
         }
 
+        logger.info("Initialization complete.");
         System.out.println("Initialization complete. Welcome to the Hub.\n");
     }
 
@@ -151,6 +161,7 @@ public class Main {
                 case "9" -> { handleMissionDispatch(); waitForEnter(); }
                 case "10" -> { hub.emergencyEvacuation(); waitForEnter(); }
                 case "0" -> {
+                    logger.info("Terminal shutdown requested.");
                     System.out.println("Shutting down terminal. Goodbye.");
                     running = false;
                 }
@@ -217,8 +228,10 @@ public class Main {
             SpaceShip selectedShip = ships.get(shipChoice);
             hub.assignShipToBay(selectedShip.getId(), bayChoice);
         } catch (NumberFormatException e) {
+            logger.warn("[MENU] Invalid numeric input during docking");
             System.out.println("Invalid input. Please enter a valid number.");
         } catch (Exception e) {
+            logger.error("[MENU] Docking error: {}", e.getMessage());
             System.out.println("Error: " + e.getMessage());
         }
     }
@@ -235,8 +248,10 @@ public class Main {
                 System.out.println("That bay is already empty or does not exist.");
             }
         } catch (NumberFormatException e) {
+            logger.warn("[MENU] Invalid numeric input during undocking");
             System.out.println("Invalid input. Please enter a number.");
         } catch (Exception e) {
+            logger.error("[MENU] Undocking error: {}", e.getMessage());
             System.out.println("Error: " + e.getMessage());
         }
     }
@@ -312,30 +327,26 @@ public class Main {
             hub.unassignShipFromBay(selectedShip.getId());
 
         } catch (NumberFormatException e) {
+            logger.warn("[MENU] Invalid numeric input during mission dispatch");
             System.out.println("Invalid input. Please enter a valid number.");
         } catch (IllegalStateException | IllegalArgumentException e) {
+            logger.warn("[MENU] Mission aborted: {}", e.getMessage());
             System.out.println("Mission Aborted: " + e.getMessage());
         }
     }
 
+    /**
+     * Prints all personnel from REGISTERED ships, not currently docked ones
+     */
     private static void handlePersonnelReport() {
-        List<DockingBay> occupiedBays = hub.getBaysByStatus(true);
-        if (occupiedBays.isEmpty()) {
-            System.out.println("No docked ships — no personnel to report.");
-            return;
-        }
-
-        Set<CrewMember> personnel = new TreeSet<>();
-        for (DockingBay bay : occupiedBays) {
-            personnel.addAll(bay.getSpaceShip().getCrewMembers());
-        }
+        Set<CrewMember> personnel = hub.generatePersonnelReport();
 
         if (personnel.isEmpty()) {
-            System.out.println("[HUB] Docked ships have no crew on board.");
+            System.out.println("[HUB] Ships have no crew on board.");
             return;
         }
 
-        System.out.println("\n--- DOCKED PERSONNEL REPORT ---");
+        System.out.println("\n--- PERSONNEL REPORT ---");
         for (CrewMember crew : personnel) {
             System.out.printf("  - %s [%s]%n", crew, crew.getSpecies());
         }
@@ -391,8 +402,10 @@ public class Main {
             };
             hub.findHeaviestCargoShip(filter);
         } catch (NumberFormatException e) {
+            logger.warn("[MENU] Invalid numeric input for heaviest cargo search");
             System.out.println("Invalid input. Please enter a valid number.");
         } catch (IllegalArgumentException e) {
+            logger.error("[MENU] Heaviest cargo search error: {}", e.getMessage());
             System.out.println("Error: " + e.getMessage());
         }
     }

@@ -5,7 +5,11 @@ import com.octavian.galactic.exception.InsufficientContainmentException;
 import com.octavian.galactic.model.Size;
 import com.octavian.galactic.model.cargo.CargoItem;
 import com.octavian.galactic.model.cargo.HazardousCargo;
+import com.octavian.galactic.service.AuditService;
 import jakarta.persistence.*;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -20,6 +24,7 @@ public class CargoShip extends SpaceShip {
 
     @OneToMany(mappedBy = "cargoShip", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<CargoManifestEntry> cargoManifestLine = new ArrayList<>();
+    private static final Logger logger = LoggerFactory.getLogger(CargoShip.class);
 
     protected CargoShip() {}
 
@@ -57,7 +62,8 @@ public class CargoShip extends SpaceShip {
     }
     public void addCargoItem(CargoItem item, int quantity) {
         if (item == null || quantity <= 0) {
-            System.out.println("[LOGISTICS] Cannot insert a null item or with a quantity of 0!");
+            logger.warn("[LOGISTICS] Cannot insert a null item or with a quantity of 0!");
+//            System.out.println("[LOGISTICS] Cannot insert a null item or with a quantity of 0!");
             return;
         }
         double currentWeight = cargoManifestLine.stream()
@@ -69,7 +75,7 @@ public class CargoShip extends SpaceShip {
             throw new CargoCapacityExceededException(this.getName(), item.getName(), quantity, overBy);
         }
         if(item instanceof HazardousCargo){
-            System.out.println(((HazardousCargo) item).getHandlingWarning() + "-->" + item.getName());
+            logger.warn("[LOGISTICS] {} --> {}", ((HazardousCargo) item).getHandlingWarning(), item.getName());
 
             if(!((HazardousCargo) item).isContainmentAdequate()){
                 throw new InsufficientContainmentException(item.getName(), ((HazardousCargo) item).getContainmentType());
@@ -81,7 +87,9 @@ public class CargoShip extends SpaceShip {
                 .ifPresentOrElse(
                         e -> e.addQuantity(quantity),
                         () -> cargoManifestLine.add(new CargoManifestEntry(this, item, quantity)));
-        System.out.printf("[LOGISTICS] Loaded %s with [%d] x '%s' %n", this.getName(), quantity, item.getName());
+        logger.info("[LOGISTICS] Loaded {} with [{}] x '{}'", this.getName(), quantity, item.getName());
+        AuditService.log(AuditService.Action.CARGO_LOADED, this.getName(), "Loaded with " + quantity + " x '" + item.getName());
+//        System.out.printf("[LOGISTICS] Loaded %s with [%d] x '%s' %n", this.getName(), quantity, item.getName());
     }
 
     public Map<CargoItem, Integer> getCargoManifest(){
@@ -99,7 +107,7 @@ public class CargoShip extends SpaceShip {
     }
 
     public void printCargoManifest() {
-        System.out.printf("[INSPECTION] Here is the cargo manifest for the ship '%s' %n", this.getName());
-        System.out.println("[LOGISTICS] Cargo contents: " + getCargoManifest());
+        logger.info("[INSPECTION] Here is the cargo manifest for the ship '{}'", this.getName());
+        logger.info("[LOGISTICS] Cargo contents: {}", getCargoManifest());
     }
 }

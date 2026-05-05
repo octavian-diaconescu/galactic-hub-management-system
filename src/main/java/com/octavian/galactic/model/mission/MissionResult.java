@@ -1,6 +1,10 @@
 package com.octavian.galactic.model.mission;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 public class MissionResult {
+    private static final Logger logger = LoggerFactory.getLogger(MissionResult.class);
     private final Mission mission;
     private final SpaceEvent event;
     private final boolean success;
@@ -92,15 +96,21 @@ public class MissionResult {
     }
 
     public void printSummary() {
-        System.out.println("\n========== MISSION REPORT ==========");
-        System.out.printf("Mission   : %s%n", mission.name());
-        System.out.printf("Type      : %s%n", mission.type());
-        System.out.printf("Event     : %s%n", event);
-        System.out.printf("Outcome   : %s%n", success ? "SUCCESS" : "FAILED");
-        System.out.printf("Credits   : +%.0f%n", creditsEarned);
-        System.out.printf("Hull Dmg  : -%d%n", hullDamageTaken);
-        System.out.printf("Fuel Used : -%d%n", fuelConsumed);
-        System.out.printf("Log       : %s%n", narrative);
-        System.out.println("====================================\n");
+        logger.info("""
+                
+                ========== MISSION REPORT ==========
+                Mission   : {}
+                Type      : {}
+                Event     : {}
+                Outcome   : {}
+                Credits   : +{}
+                Hull Dmg  : -{}
+                Fuel Used : -{}
+                Log       : {}
+                ====================================""",
+                mission.name(), mission.type(), event,
+                success ? "SUCCESS" : "FAILED",
+                String.format("%.0f", creditsEarned),
+                hullDamageTaken, fuelConsumed, narrative);
     }
 }

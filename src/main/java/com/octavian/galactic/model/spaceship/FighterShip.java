@@ -2,6 +2,8 @@ package com.octavian.galactic.model.spaceship;
 
 import com.octavian.galactic.model.Size;
 import jakarta.persistence.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 //TODO: implement game logic
 // I'm getting closer and closer to turning this into a game, which is beyond the scope of the project's requirements :)
@@ -10,6 +12,8 @@ import jakarta.persistence.*;
 @Table(name = "fighter_ship")
 @DiscriminatorValue("FIGHTER")
 public class FighterShip extends SpaceShip {
+    private static final Logger logger = LoggerFactory.getLogger(FighterShip.class);
+
     public enum WeaponClass {
         LASER,   // Fast, energy-based
         TORPEDO, // Slow, high-damage
@@ -81,29 +85,29 @@ public class FighterShip extends SpaceShip {
     }
     public void armWeapons() {
         if (weaponsArmed) {
-            System.out.printf("[COMBAT] '%s' weapons' are already armed.%n", this.getName());
+            logger.warn("[COMBAT] '{}' weapons are already armed.", this.getName());
             return;
         }
-        System.out.printf("[COMBAT] '%s' weapons armed. Primary: %s%n", this.getName(), primaryWeapon);
+        logger.info("[COMBAT] '{}' weapons armed. Primary: {}", this.getName(), primaryWeapon);
         weaponsArmed = true;
     }
 
     public void unarmWeapons() {
         weaponsArmed = false;
-        System.out.printf("[COMBAT] '%s' has been unarmed.%n", this.getName());
+        logger.info("[COMBAT] '{}' has been unarmed.", this.getName());
     }
 
     public void fire() {
         if (!weaponsArmed) {
-            System.out.printf("[COMBAT] Cannot fire -- '%s' weapons are not armed.%n", this.getName());
+            logger.warn("[COMBAT] Cannot fire -- '{}' weapons are not armed.", this.getName());
             return;
         }
         if (fuelTankIsEmpty()) {
-            System.out.printf("[COMBAT] '%s' has no fuel. Firing systems offline.%n", this.getName());
+            logger.warn("[COMBAT] '{}' has no fuel. Firing systems offline.", this.getName());
             return;
         }
         if (primaryWeapon != WeaponClass.LASER && ammunitionCount <= 0) {
-            System.out.printf("[COMBAT] '%s' is out of ammunition.%n", this.getName());
+            logger.warn("[COMBAT] '{}' is out of ammunition.", this.getName());
             return;
         }
 
@@ -120,7 +124,7 @@ public class FighterShip extends SpaceShip {
         int damageToHull = Math.max(0, damageAmount - shieldStrength);
         shieldStrength = Math.max(0, shieldStrength - damageAmount);
 
-        System.out.printf("[COMBAT] '%s' took %d damage. Shield: %d | Hull: %d%n",
+        logger.info("[COMBAT] '{}' took {} damage. Shield: {} | Hull: {}",
                 getName(), damageAmount, shieldStrength, getHullIntegrity());
 
         if (damageToHull > 0) {
@@ -140,11 +144,11 @@ public class FighterShip extends SpaceShip {
     }
 
     public void printCombatStatus() {
-        System.out.printf("[COMBAT-STATUS] Fighter '%s' | Weapon: %s | Shield: %d | Ammo: %s | Armed: %s | Readiness: %.0f%% %n",
+        logger.info("[COMBAT-STATUS] Fighter '{}' | Weapon: {} | Shield: {} | Ammo: {} | Armed: {} | Readiness: {}%",
                 this.getName(), primaryWeapon, shieldStrength,
                 primaryWeapon == WeaponClass.LASER ? "inf" : String.valueOf(ammunitionCount),
                 weaponsArmed ? "YES" : "NO",
-                getCombatReadiness() * 100);
+                String.format("%.0f", getCombatReadiness() * 100));
     }
 
     public WeaponClass getPrimaryWeapon() {

@@ -1,0 +1,52 @@
+<configuration>
+    <!-- Console: colored, human-readable -->
+    <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>%d{HH:mm:ss} %-5level [%logger{20}] - %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <!-- Rolling application log:  one file per day, kept for 30 days -->
+    <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>logs/galactic-hub.log</file>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>logs/galactic-hub.%d{yyyy-MM-dd}.log</fileNamePattern>
+            <maxHistory>30</maxHistory>
+        </rollingPolicy>
+        <encoder>
+            <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} %-5level [%thread] %logger{36} - %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <!-- CSV Audit log: one record per action -->
+    <appender name="CSV_AUDIT" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>logs/audit.csv</file>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>logs/audit.%d{yyyy-MM-dd}.csv</fileNamePattern>
+            <maxHistory>90</maxHistory>
+        </rollingPolicy>
+        <encoder>
+            <pattern>%msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <!-- Full detail -->
+    <logger name="com.octavian.galactic" level="DEBUG" additivity="false">
+        <appender-ref ref="CONSOLE"/>
+        <appender-ref ref="FILE"/>
+    </logger>
+
+    <!-- Audit events only go to the CSV file -->
+    <logger name="AUDIT" level="INFO" additivity="false">
+        <appender-ref ref="CSV_AUDIT"/>
+    </logger>
+
+<!--     Hibernate: only warnings -->
+    <logger name="org.hibernate" level="WARN"/>
+
+    <!-- Root fallback -->
+    <root level="INFO">
+        <appender-ref ref="CONSOLE"/>
+    </root>
+
+</configuration>

@@ -8,12 +8,16 @@ import com.octavian.galactic.model.spaceship.*;
 import com.octavian.galactic.model.station.*;
 import com.octavian.galactic.repository.DockingBayRepository;
 import com.octavian.galactic.repository.ShipRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
 public class HubService {
+    private static final Logger logger = LoggerFactory.getLogger(HubService.class);
+
     private List<SpaceShip> registeredShips = new ArrayList<>(); // Keep a record of every ship that has ever visited
     private Map<Integer, DockingBay> dockingBays = new HashMap<>(); // Manage physical locations
     private final String name;
@@ -66,7 +70,8 @@ public class HubService {
             throw new IllegalArgumentException("Docking bay cannot be null");
         }
         if (dockingBays.containsValue(dockingBay)) {
-            System.out.println("Docking bay '" + dockingBay.getName() + "' already exists.");
+            logger.warn("Docking bay '{}' already exists.", dockingBay.getName());
+//            System.out.println("Docking bay '" + dockingBay.getName() + "' already exists.");
             return;
         }
         dockingBay.setBayNumber(++dockingBayNumber);
@@ -75,6 +80,8 @@ public class HubService {
         } else {
             dockingBays.put(dockingBay.getBayNumber(), dockingBay);
         }
+
+        AuditService.log(AuditService.Action.BAY_ADDED, dockingBay.getName());
     }
 
     public void removeDockingBay(UUID id) {
@@ -90,14 +97,17 @@ public class HubService {
         targetBay.ifPresentOrElse(
                 entry -> {
                     if (entry.getValue().isOccupied()) {
-                        System.out.println("[HUB] Error: Cannot remove Bay " + entry.getKey() + ". A ship is currently docked!");
+//                        System.out.println("[HUB] Error: Cannot remove Bay " + entry.getKey() + ". A ship is currently docked!");
+                        logger.warn("[HUB] Error: Cannot remove Bay '{}'. A ship is currently docked!", entry.getKey());
                     } else {
                         if (dockingBayRepository != null) {
                             dockingBayRepository.delete(entry.getValue());
                         } else {
                             dockingBays.remove(entry.getKey());
                         }
-                        System.out.println("[HUB] Successfully removed bay: " + entry.getValue().getName());
+//                        System.out.println("[HUB] Successfully removed bay: " + entry.getValue().getName());
+                        logger.info("[HUB] Successfully removed bay: {}", entry.getValue().getName());
+                        AuditService.log(AuditService.Action.BAY_REMOVED, entry.getValue().getName(), entry.getValue().getClass().getSimpleName());
                     }
                 },
                 () -> {
@@ -124,10 +134,12 @@ public class HubService {
             throw new IllegalArgumentException("[HUB] Error: Ship cannot be null");
         }
         if (registeredShips.contains(ship)) {
-            System.out.printf("[HUB] Error: Ship '%s' already in history%n", ship.getName());
+            logger.warn("[HUB] Error: Ship '{}' already in history", ship.getName());
+//            System.out.printf("[HUB] Error: Ship '%s' already in history%n", ship.getName());
             return;
         }
         registeredShips.add(ship);
+        AuditService.log(AuditService.Action.SHIP_REGISTERED, ship.getName(), ship.getClass().getSimpleName());
         if (shipRepository != null) {
             shipRepository.save(ship);
         }
@@ -162,7 +174,8 @@ public class HubService {
                 .ifPresentOrElse(
                         ship -> {
                             if (bay.isOccupied()) {
-                                System.out.println("[HUB] Error: Docking Bay " + bayNumber + " is already occupied by " + ship.getName());
+                                logger.warn("[HUB] Error: Docking Bay {} is already occupied by {}", bayNumber, ship.getName());
+//                                System.out.println("[HUB] Error: Docking Bay " + bayNumber + " is already occupied by " + ship.getName());
 
                             } else if (ship.getShipSize().compareTo(bay.getBaySize()) <= 0) {
                                 // Size validation is enforced by the bay itself through the dockSpaceShip method
@@ -172,12 +185,16 @@ public class HubService {
                                         dockingBayRepository.update(bay);
                                     }
                                 } catch (IllegalStateException e) {
-                                    System.out.println("[HUB] Error: " + e.getMessage());
+                                    logger.error("[HUB] Error: ", e);
+//                                    System.out.println("[HUB] Error: " + e.getMessage());
                                     return;
                                 }
-                                System.out.printf("[HUB] Success: '%s' parked in bay %d%n", ship.getName(), bayNumber);
+                                logger.info("[HUB] Success: '{}' parked in bay {}", ship.getName(), bayNumber);
+                                AuditService.log(AuditService.Action.SHIP_DOCKED, ship.getName(), ship.getClass().getSimpleName());
+//                                System.out.printf("[HUB] Success: '%s' parked in bay %d%n", ship.getName(), bayNumber);
                             } else {
-                                System.out.printf("[HUB] Error: Ship '%s' is too large for bay %d%n", ship.getName(), bayNumber);
+                                logger.warn("[HUB] Error: Ship '{}' is too large for bay {}", ship.getName(), bayNumber);
+//                                System.out.printf("[HUB] Error: Ship '%s' is too large for bay %d%n", ship.getName(), bayNumber);
                             }
                         },
                         () -> {
@@ -191,7 +208,8 @@ public class HubService {
         registeredShips = getPersistedShips();
 
         if (dockingBays.isEmpty()) {
-            System.out.println("[HUB] Error: No docking bays found.");
+            logger.warn("[HUB] Error: No docking bays found.");
+//            System.out.println("[HUB] Error: No docking bays found.");
             return;
         }
 
@@ -201,7 +219,9 @@ public class HubService {
                 .findFirst()
                 .ifPresentOrElse(
                         entry -> {
+                            logger.info("Ship '{}' undocked from bay {}", entry.getSpaceShip().getName(), entry.getName());
                             entry.undockSpaceShip();
+                            AuditService.log(AuditService.Action.SHIP_UNDOCKED, entry.getName(), entry.getClass().getSimpleName());
                             if (dockingBayRepository != null) {
                                 dockingBayRepository.update(entry);
                             }
@@ -227,6 +247,7 @@ public class HubService {
                 .findFirst()
                 .ifPresentOrElse(entry -> {
                             entry.getSpaceShip().addCrewMember(crew);
+                            AuditService.log(AuditService.Action.CREW_ONBOARDED, entry.getSpaceShip().getName(), "Crew onboard ship");
                             if (shipRepository != null) {
                                 shipRepository.update(entry.getSpaceShip());
                             }
@@ -266,13 +287,17 @@ public class HubService {
                     sourceShip.removeCrewMember(crewId);
                     destinationShip.addCrewMember(crew);
 
+                    AuditService.log(AuditService.Action.CREW_TRANSFERRED, sourceShip.getName(), destinationShip.getName());
+
                     if (shipRepository != null) {
                         shipRepository.update(sourceShip);
                         shipRepository.update(destinationShip);
                     }
 
-                    System.out.printf("[HUB] Success: Transferred %s from '%s' to '%s'.%n",
+                    logger.info("[HUB] Success: Transferred {} from '{}' to '{}'",
                             crew.getName(), sourceShip.getName(), destinationShip.getName());
+//                    System.out.printf("[HUB] Success: Transferred %s from '%s' to '%s'.%n",
+//                            crew.getName(), sourceShip.getName(), destinationShip.getName());
                 },
                 () -> {
                     throw new IllegalStateException("Crew member (" + crewId.toString().substring(0, 8) + ") not found on '" + sourceShip.getName() + "'");
@@ -310,37 +335,48 @@ public class HubService {
                     .collect(Collectors.toSet());
 
             if (hazardousCargoManifest.isEmpty()) {
-                System.out.println("[HUB] No hazardous materials detected.");
+                logger.info("[HUB] No hazardous materials detected.");
+//                System.out.println("[HUB] No hazardous materials detected.");
                 return false;
             }
 
-            System.out.println("[HUB] HAZARDOUS MATERIALS DETECTED. Printing unsafe cargo report...");
-            System.out.println(hazardousCargoManifest);
+            logger.info("[HUB] HAZARDOUS MATERIALS DETECTED. Printing unsafe cargo report...");
+            logger.info(hazardousCargoManifest.toString());
+            AuditService.log(AuditService.Action.HAZARD_SCAN, targetShip.getName(), "Hazard manifest:" + hazardousCargoManifest);
+//            System.out.println("[HUB] HAZARDOUS MATERIALS DETECTED. Printing unsafe cargo report...");
+//            System.out.println(hazardousCargoManifest);
             return true;
         } else {
-            System.out.println("[HUB] The selected ship isn't a cargo ship. Scan aborted.");
+            logger.warn("[HUB] The selected ship isn't a cargo ship. Scan aborted.");
+//            System.out.println("[HUB] The selected ship isn't a cargo ship. Scan aborted.");
         }
         return false;
     }
 
     // I may want this to return a Set<CrewMember>. For now, it prints the personnelReport.
-    public void generatePersonnelReport() {
+    public Set<CrewMember> generatePersonnelReport() {
+        registeredShips = getPersistedShips();
+
         Set<CrewMember> personnelReport = new TreeSet<>();
         if (registeredShips.isEmpty()) {
-            System.out.println("[HUB] No ships have been registered so far.");
-            return;
+            logger.warn("[HUB] No ships have been registered so far.");
+//            System.out.println("[HUB] No ships have been registered so far.");
+            return Set.of();
         }
 
         for (SpaceShip ship : registeredShips) {
             personnelReport.addAll(ship.getCrewMembers());
         }
-        System.out.println("[HUB] Personnel report:");
-        System.out.println(personnelReport);
+
+//        System.out.println("[HUB] Personnel report:");
+//        System.out.println(personnelReport);
+        return personnelReport;
     }
 
     public double calculateDockingFeesPerShip(UUID shipId) {
         if (dockingBays.isEmpty()) {
-            System.out.println("[HUB] No docking bays exist.");
+            logger.warn("[HUB] No docking bays exist.");
+//            System.out.println("[HUB] No docking bays exist.");
             return 0.0;
         }
 
@@ -388,8 +424,10 @@ public class HubService {
         // Perform the maintenance
         if (fuelNeeded > 0) {
             if (fuelDepot.fuelTankIsEmpty()) {
-                System.out.printf("[HUB-BILLING] Warning: depot empty, '%s' could not be refueled%n",
+                logger.warn("[HUB-BILLING] Warning: depot empty, '{}' could not be refueled",
                         dockedShip.getName());
+//                System.out.printf("[HUB-BILLING] Warning: depot empty, '%s' could not be refueled%n",
+//                        dockedShip.getName());
                 fuelNeeded = 0; // No fuel dispensed, don't bill for it
             } else {
                 int dispensable = Math.min(fuelNeeded, fuelDepot.getFuelLevel());
@@ -405,11 +443,12 @@ public class HubService {
 
         // I may want to decouple the invoice logic from the calculation of the docking fee
         // Generate Invoice
-        System.out.printf("[HUB-BILLING] Invoice for (%s)'%s' :%n", dockedShip.getClass().getSimpleName(), dockedShip.getName());
-        System.out.printf("----> Base Fee: %.2f%n", baseFee);
-        System.out.printf("----> Fuel Added: %d units | Repairs: %d units%n", fuelNeeded, repairsNeeded);
-        System.out.printf("----> Total Charged: %.2f credits%n", shipTotalBill);
-
+        logger.info("[HUB-BILLING] Invoice for ({})'{}' :\n ----> Base Fee: {}\n ----> Fuel Added: {} units | Repairs: {} units \n ----> Total Charged: {} credits", dockedShip.getClass().getSimpleName(), dockedShip.getName(), String.format("%.2f", baseFee), fuelNeeded, repairsNeeded, String.format("%.2f",shipTotalBill));
+//        System.out.printf("[HUB-BILLING] Invoice for (%s)'%s' :%n", dockedShip.getClass().getSimpleName(), dockedShip.getName());
+//        System.out.printf("----> Base Fee: %.2f%n", baseFee);
+//        System.out.printf("----> Fuel Added: %d units | Repairs: %d units%n", fuelNeeded, repairsNeeded);
+//        System.out.printf("----> Total Charged: %.2f credits%n", shipTotalBill);
+        AuditService.log(AuditService.Action.BILLING_GENERATED, dockedShip.getName(), dockedShip.getClass().getSimpleName());
         return shipTotalBill;
     }
 
@@ -428,13 +467,15 @@ public class HubService {
             }
         }
 
-        System.out.printf("[HUB-BILLING] End of day report: Total Station Revenue = %.2f credits.%n", totalRevenue);
+//        System.out.printf("[HUB-BILLING] End of day report: Total Station Revenue = %.2f credits.%n", totalRevenue);
+        logger.info("[HUB-BILLING] End of day report: Total Station Revenue = {} credits.%n", String.format("%.2f", totalRevenue));
         return totalRevenue;
     }
 
     private double calculateCargoWeight(CargoShip ship) {
         if (ship == null) {
-            System.out.println("CargoShip cannot be null.");
+            logger.warn("CargoShip cannot be null.");
+//            System.out.println("CargoShip cannot be null.");
             return -1.0;
         }
 
@@ -451,7 +492,8 @@ public class HubService {
 
         if (filter.equalsIgnoreCase("all time")) {
             if (registeredShips.isEmpty()) {
-                System.out.println("[HUB] No ships have been registered yet.");
+                logger.warn("[HUB] No ships have been registered yet.");
+//                System.out.println("[HUB] No ships have been registered yet.");
                 return Optional.empty();
             }
 
@@ -462,7 +504,8 @@ public class HubService {
                     .max(Comparator.comparingDouble(this::calculateCargoWeight));
         } else if (filter.equalsIgnoreCase("docked")) {
             if (dockingBays.isEmpty()) {
-                System.out.println("[HUB] No docking bays exist.");
+                logger.warn("[HUB][HeaviestCargoShip] No docking bays exist.");
+//                System.out.println("[HUB] No docking bays exist.");
                 return Optional.empty();
             }
 
@@ -473,14 +516,16 @@ public class HubService {
                     .map(ship -> (CargoShip) ship)
                     .max(Comparator.comparingDouble(this::calculateCargoWeight));
         } else {
-            System.out.println("[HUB] Error: Invalid filter. Use 'all time' or 'docked'.");
+            logger.warn("[HUB] Error: Invalid filter '{}'. Use 'all time' or 'docked'.", filter);
             return Optional.empty();
         }
 
         heaviestShip.ifPresentOrElse(
-                ship -> System.out.printf("[HUB] The heaviest %s cargo ship is '%s' carrying %.2f Tonnes.%n",
-                        filter.toLowerCase(), ship.getName(), calculateCargoWeight(ship)),
-                () -> System.out.println("[HUB] No cargo ships found matching the '" + filter + "' filter.")
+                ship -> logger.info("[HUB] The heaviest {} cargo ship is '{}' carrying {} Tonnes.",
+                        filter.toLowerCase(), ship.getName(), String.format("%.2f",calculateCargoWeight(ship))),
+//                        System.out.printf("[HUB] The heaviest %s cargo ship is '%s' carrying %.2f Tonnes.%n",
+//                        filter.toLowerCase(), ship.getName(), calculateCargoWeight(ship)),
+                () -> logger.info("[HUB] No cargo ships found matching the '{}'", filter)
         );
         return heaviestShip;
     }
@@ -492,7 +537,9 @@ public class HubService {
                 .toList();
 
         if (filteredBays.isEmpty()) {
-            System.out.println(occupied ? "[HUB] No docking bays are currently occupied." : "[HUB] All docking bays are full.");
+            String occupiedString = occupied ? "[HUB] No docking bays are currently occupied." : "[HUB] All docking bays are full.";
+            logger.info(occupiedString);
+//            System.out.println(occupied ? "[HUB] No docking bays are currently occupied." : "[HUB] All docking bays are full.");
         }
 
         return filteredBays.isEmpty() ? new ArrayList<>() : filteredBays;
@@ -500,7 +547,8 @@ public class HubService {
 
     public void emergencyEvacuation() {
         if (dockingBays.isEmpty()) {
-            System.out.println("[HUB] All docking bays are empty. There is no one to evacuate");
+            logger.warn("[HUB] All docking bays are empty. There is no one to evacuate");
+//            System.out.println("[HUB] All docking bays are empty. There is no one to evacuate");
             return;
         }
 
@@ -511,7 +559,8 @@ public class HubService {
                 .mapToInt(bay -> bay.getSpaceShip().getCrewMembers().size())
                 .sum();
         if (totalEvacuated == 0) {
-            System.out.println("[HUB] Ships didn't have anyone on board. There is no one to evacuate");
+            logger.warn("[HUB] Ships didn't have anyone on board. There is no one to evacuate");
+//            System.out.println("[HUB] Ships didn't have anyone on board. There is no one to evacuate");
             return;
         }
 
@@ -519,11 +568,12 @@ public class HubService {
                 .filter(DockingBay::isOccupied)
                 .forEach(dockingBay -> {
                     dockingBay.undockSpaceShip();
+                    AuditService.log(AuditService.Action.EMERGENCY_EVACUATION, dockingBay.getName());
                     if (dockingBayRepository != null) {
                         dockingBayRepository.update(dockingBay);
                     }
                 });
-
-        System.out.printf("[HUB] EMERGENCY OVERRIDE: Successfully evacuated %d personnel%n", totalEvacuated);
+        logger.info("[HUB] EMERGENCY OVERRIDE: Successfully evacuated {} personnel", totalEvacuated);
+//        System.out.printf("[HUB] EMERGENCY OVERRIDE: Successfully evacuated %d personnel%n", totalEvacuated);
     }
 }

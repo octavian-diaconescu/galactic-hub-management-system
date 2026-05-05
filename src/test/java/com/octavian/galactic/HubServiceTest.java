@@ -117,8 +117,13 @@ public class HubServiceTest {
         hubService.removeDockingBay(dockingBay2.getId());
 
         // Assert
-        hubService.generatePersonnelReport();
-
+        Set<CrewMember> personnelReport;
+        personnelReport = hubService.generatePersonnelReport();
+        if (personnelReport.isEmpty()) {
+            System.out.println("[HUB] Ships have no crew on board.");
+        } else {
+            System.out.println("[HUB] Personnel report: " + personnelReport);
+        }
         // Verify Ship Registry
         // Both ships are now successfully registered
         assertEquals(2, hubService.getRegisteredShips().size(), "Both TARS and RATS should be registered");

@@ -4,9 +4,13 @@ import com.octavian.galactic.exception.InsufficientFuelException;
 import com.octavian.galactic.model.Fuellable;
 import com.octavian.galactic.model.SpaceEntity;
 import com.octavian.galactic.model.spaceship.SpaceShip;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 //TODO: persist FuelDepot class
 public class FuelDepot extends SpaceEntity implements Fuellable {
+    private static final Logger logger = LoggerFactory.getLogger(FuelDepot.class);
+
     private int fuelLevel;
     private final int fuelCapacity;
 
@@ -26,7 +30,7 @@ public class FuelDepot extends SpaceEntity implements Fuellable {
 
         fuelLevel -= amount;
         ship.refuel(amount);
-        System.out.printf("[DEPOT] '%s' dispensed %d units to '%s'. Depot reserve: %d/%d%n",
+        logger.info("[DEPOT] '{}' dispensed {} units to '{}'. Depot reserve: {}/{}",
                 this.getName(), amount, ship.getName(), fuelLevel, fuelCapacity);
     }
 
@@ -37,11 +41,10 @@ public class FuelDepot extends SpaceEntity implements Fuellable {
         int space = fuelCapacity - fuelLevel;
         int actualAmount = Math.min(amount, space); // can't exceed capacity
         fuelLevel += actualAmount;
-        System.out.printf("[DEPOT] '%s' restocked by %d units. Reserve: %d/%d%n",
+        logger.info("[DEPOT] '{}' restocked by {} units. Reserve: {}/{}",
                 this.getName(), actualAmount, fuelLevel, fuelCapacity);
         if (actualAmount < amount)
-            System.out.printf("[DEPOT] Warning: depot full, %d units discarded%n",
-                    amount - actualAmount);
+            logger.warn("[DEPOT] Depot full, {} units discarded", amount - actualAmount);
     }
 
     @Override
