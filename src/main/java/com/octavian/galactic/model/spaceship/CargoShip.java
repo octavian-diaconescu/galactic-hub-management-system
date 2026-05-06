@@ -62,7 +62,7 @@ public class CargoShip extends SpaceShip {
     }
     public void addCargoItem(CargoItem item, int quantity) {
         if (item == null || quantity <= 0) {
-            logger.warn("[LOGISTICS] Cannot insert a null item or with a quantity of 0!");
+            logger.warn("[LOGISTICS] Cannot insert a null item or with a quantity of 0");
 //            System.out.println("[LOGISTICS] Cannot insert a null item or with a quantity of 0!");
             return;
         }
@@ -75,7 +75,7 @@ public class CargoShip extends SpaceShip {
             throw new CargoCapacityExceededException(this.getName(), item.getName(), quantity, overBy);
         }
         if(item instanceof HazardousCargo){
-            logger.warn("[LOGISTICS] {} --> {}", ((HazardousCargo) item).getHandlingWarning(), item.getName());
+            logger.info("[LOGISTICS] {} --> {}", ((HazardousCargo) item).getHandlingWarning(), item.getName());
 
             if(!((HazardousCargo) item).isContainmentAdequate()){
                 throw new InsufficientContainmentException(item.getName(), ((HazardousCargo) item).getContainmentType());

@@ -37,9 +37,9 @@ public class CargoTest {
         cargoShip.addCargoItem(hazardousCargoWithDescription, 1);
         cargoShip.addCargoItem(hazardousCargoWithDescription2, 1);
 
-        hazardousCargoWithDescription.printItemInfo();
-        hazardousCargoWithDescription2.printItemInfo();
-        hc.printItemInfo();
+//        hazardousCargoWithDescription.printItemInfo();
+//        hazardousCargoWithDescription2.printItemInfo();
+//        hc.printItemInfo();
         cargoShip.printCargoManifest();
 
         // Assert

@@ -179,7 +179,7 @@ public abstract class SpaceShip extends SpaceEntity implements Fuellable {
         int fuelCost = calculateFuelCost(distance);
 
         if (fuelLevel < fuelCost) {
-            logger.warn("[NAV] '{}' cannot travel {} units: needs {} fuel, has {}.",
+            logger.info("[NAV] '{}' cannot travel {} units: needs {} fuel, has {}.",
                     this.getName(), distance, fuelCost, fuelLevel);
             return false;
         }

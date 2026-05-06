@@ -18,7 +18,6 @@ import static org.junit.jupiter.api.Assertions.*;
 public class HubServiceTest {
     private HubService hubService;
     private HubService mainHub;
-    private FuelDepot fuelDepot;
 
     private DockingBay dockingBay;
     private DockingBay dockingBay2;
@@ -39,7 +38,7 @@ public class HubServiceTest {
 
     @BeforeEach
     void setUp() {
-        fuelDepot = new FuelDepot("Fuel Depot", 10000, 8000);
+        FuelDepot fuelDepot = new FuelDepot("Fuel Depot", 10000, 8000);
         mainHub = new HubService("MAIN HUB", fuelDepot);
         hubService = new HubService("HUB ALPHA", fuelDepot);
 
@@ -117,13 +116,13 @@ public class HubServiceTest {
         hubService.removeDockingBay(dockingBay2.getId());
 
         // Assert
-        Set<CrewMember> personnelReport;
-        personnelReport = hubService.generatePersonnelReport();
-        if (personnelReport.isEmpty()) {
-            System.out.println("[HUB] Ships have no crew on board.");
-        } else {
-            System.out.println("[HUB] Personnel report: " + personnelReport);
-        }
+//        Set<CrewMember> personnelReport;
+//        personnelReport = hubService.generatePersonnelReport();
+//        if (personnelReport.isEmpty()) {
+//            System.out.println("[HUB] Ships have no crew on board.");
+//        } else {
+//            System.out.println("[HUB] Personnel report: " + personnelReport);
+//        }
         // Verify Ship Registry
         // Both ships are now successfully registered
         assertEquals(2, hubService.getRegisteredShips().size(), "Both TARS and RATS should be registered");

@@ -205,7 +205,7 @@ public class MissionDispatcher {
         int fuelCost = ship.calculateFuelCost(mission.distance());
 
         if (ship.getFuelLevel() < fuelCost) {
-            logger.warn("[MISSION] '{}' has insufficient fuel for mission '{}'. Needs {}, has {}",
+            logger.info("[MISSION] '{}' has insufficient fuel for mission '{}'. Needs {}, has {}",
                     ship.getName(), mission.name(), fuelCost, ship.getFuelLevel());
             throw new IllegalStateException(String.format(
                     "'%s' has insufficient fuel for this mission. Needs %d, has %d",

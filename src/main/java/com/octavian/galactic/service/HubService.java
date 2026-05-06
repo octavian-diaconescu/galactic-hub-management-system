@@ -70,7 +70,7 @@ public class HubService {
             throw new IllegalArgumentException("Docking bay cannot be null");
         }
         if (dockingBays.containsValue(dockingBay)) {
-            logger.warn("Docking bay '{}' already exists.", dockingBay.getName());
+            logger.info("Docking bay '{}' already exists.", dockingBay.getName());
 //            System.out.println("Docking bay '" + dockingBay.getName() + "' already exists.");
             return;
         }
@@ -134,7 +134,7 @@ public class HubService {
             throw new IllegalArgumentException("[HUB] Error: Ship cannot be null");
         }
         if (registeredShips.contains(ship)) {
-            logger.warn("[HUB] Error: Ship '{}' already in history", ship.getName());
+            logger.info("[HUB] Error: Ship '{}' already in history", ship.getName());
 //            System.out.printf("[HUB] Error: Ship '%s' already in history%n", ship.getName());
             return;
         }
@@ -174,7 +174,7 @@ public class HubService {
                 .ifPresentOrElse(
                         ship -> {
                             if (bay.isOccupied()) {
-                                logger.warn("[HUB] Error: Docking Bay {} is already occupied by {}", bayNumber, ship.getName());
+                                logger.info("[HUB] Error: Docking Bay {} is already occupied by {}", bayNumber, ship.getName());
 //                                System.out.println("[HUB] Error: Docking Bay " + bayNumber + " is already occupied by " + ship.getName());
 
                             } else if (ship.getShipSize().compareTo(bay.getBaySize()) <= 0) {
@@ -185,7 +185,7 @@ public class HubService {
                                         dockingBayRepository.update(bay);
                                     }
                                 } catch (IllegalStateException e) {
-                                    logger.error("[HUB] Error: ", e);
+                                    logger.error("[HUB] Error: {}", e.getMessage());
 //                                    System.out.println("[HUB] Error: " + e.getMessage());
                                     return;
                                 }
@@ -347,7 +347,7 @@ public class HubService {
 //            System.out.println(hazardousCargoManifest);
             return true;
         } else {
-            logger.warn("[HUB] The selected ship isn't a cargo ship. Scan aborted.");
+            logger.info("[HUB] The selected ship isn't a cargo ship. Scan aborted.");
 //            System.out.println("[HUB] The selected ship isn't a cargo ship. Scan aborted.");
         }
         return false;
