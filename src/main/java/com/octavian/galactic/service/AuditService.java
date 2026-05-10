@@ -5,6 +5,7 @@ import org.slf4j.LoggerFactory;
 
 import java.time.Instant;
 
+//TODO: turn into singleton
 public class AuditService {
     private static final Logger audit = LoggerFactory.getLogger("AUDIT");
 

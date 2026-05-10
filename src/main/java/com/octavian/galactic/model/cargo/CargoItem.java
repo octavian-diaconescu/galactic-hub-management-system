@@ -3,6 +3,9 @@ package com.octavian.galactic.model.cargo;
 import com.octavian.galactic.model.SpaceEntity;
 import jakarta.persistence.*;
 
+/*
+TODO: refactor JPA complexity for CargoItem. Use weight and description fields for each concrete CargoItem subtype to reduce query complexity. Remove CargoItem as an entity and create independent ones with the subtypes.
+ */
 @Entity
 @Table(name = "cargo_item")
 @Inheritance(strategy = InheritanceType.JOINED)
