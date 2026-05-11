@@ -2,13 +2,11 @@ package com.octavian.galactic.model.cargo;
 
 
 import jakarta.persistence.Column;
-import jakarta.persistence.DiscriminatorValue;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
 
 @Entity
 @Table(name = "hazardous_cargo")
-@DiscriminatorValue("HAZARD")
 public class HazardousCargo extends CargoItem {
     private static final int DANGEROUS_RADIATION_THRESHOLD = 7;
 

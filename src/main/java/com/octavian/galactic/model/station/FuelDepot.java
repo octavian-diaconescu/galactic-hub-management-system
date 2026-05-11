@@ -4,15 +4,23 @@ import com.octavian.galactic.exception.InsufficientFuelException;
 import com.octavian.galactic.model.Fuellable;
 import com.octavian.galactic.model.SpaceEntity;
 import com.octavian.galactic.model.spaceship.SpaceShip;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Table;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 //TODO: persist FuelDepot class
+@Entity
+@Table(name = "fuel_depot")
 public class FuelDepot extends SpaceEntity implements Fuellable {
     private static final Logger logger = LoggerFactory.getLogger(FuelDepot.class);
 
+    @Column(name = "fuel_level", nullable = false)
     private int fuelLevel;
-    private final int fuelCapacity;
+
+    @Column(name = "fuel_capacity", nullable = false)
+    private int fuelCapacity;
 
     public FuelDepot(String name, int fuelCapacity, int initialFuelLevel) {
         super(name);
@@ -21,6 +29,8 @@ public class FuelDepot extends SpaceEntity implements Fuellable {
         this.fuelCapacity = fuelCapacity;
         setFuelLevel(initialFuelLevel);
     }
+
+    protected FuelDepot() {}
 
     public void dispenseFuel(SpaceShip ship, int amount) {
         if (amount <= 0)

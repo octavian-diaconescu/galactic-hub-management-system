@@ -39,7 +39,7 @@ public class MissionDispatcher {
         applyResult(ship, result);
         result.printSummary();
 
-        AuditService.log(AuditService.Action.MISSION_DISPATCHED, ship.getName(),
+        AuditService.getInstance().log(AuditService.Action.MISSION_DISPATCHED, ship.getName(),
                 mission.type() + " | " + (result.isSuccess() ? "SUCCESS" : "FAILED"));
         logger.info("[MISSION] '{}' completed mission '{}' — {}",
                 ship.getName(), mission.name(), result.isSuccess() ? "SUCCESS" : "FAILED");

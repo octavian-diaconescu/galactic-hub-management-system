@@ -1,14 +1,12 @@
 package com.octavian.galactic.model.cargo;
 
 import jakarta.persistence.Column;
-import jakarta.persistence.DiscriminatorValue;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
 
 //TODO: instantiate class
 @Entity
 @Table(name = "manufactured_cargo")
-@DiscriminatorValue("MANUFACTURED")
 public class ManufacturedCargo extends CargoItem{
     @Column(name = "fragil_index", nullable = false)
     private int fragilityIndex; // 1 through 10
@@ -46,6 +44,7 @@ public class ManufacturedCargo extends CargoItem{
         };
     }
 
+    @SuppressWarnings("unused")
     public boolean requiresPadding() {
         return fragilityIndex >= 5;
     }

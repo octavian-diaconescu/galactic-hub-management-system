@@ -1,6 +1,7 @@
 package com.octavian.galactic.repository;
 
 import com.octavian.galactic.model.spaceship.SpaceShip;
+import com.octavian.galactic.model.station.CrewMember;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityManagerFactory;
 
@@ -55,12 +56,45 @@ public class ShipRepository implements BaseRepository<SpaceShip> {
         }
     }
 
+    @SuppressWarnings("unused")
     public List<SpaceShip> findAllWithCargo() {
         try (EntityManager em = emf.createEntityManager()) {
             return em.createQuery(
                             "SELECT DISTINCT s FROM SpaceShip s " +
                                     "LEFT JOIN FETCH s.crewMembers " +
                                     "LEFT JOIN FETCH TREAT(s AS CargoShip).cargoManifestLine cme " +
+                                    "LEFT JOIN FETCH cme.cargoItem",
+                            SpaceShip.class)
+                    .getResultList();
+        }
+    }
+
+    public List<SpaceShip> findUndockedShips() {
+        try (EntityManager em = emf.createEntityManager()) {
+            return em.createQuery(
+                            "SELECT DISTINCT s FROM SpaceShip s " +
+                                    "LEFT JOIN FETCH s.crewMembers " +
+                                    "WHERE s.docked = false",
+                            SpaceShip.class)
+                    .getResultList();
+        }
+    }
+
+    public List<CrewMember> findAllCrew() {
+        try (EntityManager em = emf.createEntityManager()) {
+            return em.createQuery(
+                            "SELECT c FROM CrewMember c WHERE c.ship IS NOT NULL",
+                            CrewMember.class)
+                    .getResultList();
+        }
+    }
+
+    public List<SpaceShip> findAllCargoShipsWithCargo() {
+        try (EntityManager em = emf.createEntityManager()) {
+            return em.createQuery(
+                            "SELECT DISTINCT s FROM CargoShip s " +
+                                    "LEFT JOIN FETCH s.crewMembers " +
+                                    "LEFT JOIN FETCH s.cargoManifestLine cme " +
                                     "LEFT JOIN FETCH cme.cargoItem",
                             SpaceShip.class)
                     .getResultList();

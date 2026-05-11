@@ -2,14 +2,12 @@ package com.octavian.galactic.model.cargo;
 
 
 import jakarta.persistence.Column;
-import jakarta.persistence.DiscriminatorValue;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
 
 //TODO: instantiate class
 @Entity
 @Table(name = "agricultural_cargo")
-@DiscriminatorValue("AGRICULTURAL")
 public class AgriculturalCargo extends CargoItem{
     @Column(name = "requires_refrigeration", nullable = false)
     private boolean requiresRefrigeration;
@@ -33,6 +31,7 @@ public class AgriculturalCargo extends CargoItem{
         this.requiresRefrigeration = requiresRefrigeration;
     }
 
+    @SuppressWarnings("unused")
     public boolean willSpoilInTransit(int transitDays) {
         if (transitDays < 0) throw new IllegalArgumentException("Transit days cannot be negative");
         return transitDays >= daysUntilSpoilage;

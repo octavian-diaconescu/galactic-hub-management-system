@@ -2,13 +2,11 @@ package com.octavian.galactic.model.spaceship;
 
 import com.octavian.galactic.model.Size;
 import jakarta.persistence.Column;
-import jakarta.persistence.DiscriminatorValue;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
 
 @Entity
 @Table(name = "scout_ship")
-@DiscriminatorValue("SCOUT")
 // A fast, light ship for exploration (doesn't store cargo)
 public class ScoutShip extends SpaceShip {
     @Column(name = "sensor_range", nullable = false)
@@ -27,6 +25,7 @@ public class ScoutShip extends SpaceShip {
 
     public static class Builder extends AbstractBuilder<Builder> {
         private int sensorRange = 100;
+        @SuppressWarnings("all")
         private boolean isStealthEnabled = false;
 
         public Builder(String name, Size size) {
@@ -54,6 +53,7 @@ public class ScoutShip extends SpaceShip {
         }
     }
 
+    @SuppressWarnings("unused")
     public boolean isStealthEnabled() {
         return isStealthEnabled;
     }

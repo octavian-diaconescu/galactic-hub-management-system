@@ -5,10 +5,13 @@ import org.slf4j.LoggerFactory;
 
 import java.time.Instant;
 
-//TODO: turn into singleton
 public class AuditService {
     private static final Logger audit = LoggerFactory.getLogger("AUDIT");
+    private static final AuditService INSTANCE = new AuditService();
 
+    public static AuditService getInstance() {
+        return INSTANCE;
+    }
     private AuditService() {}
 
     public enum Action{
@@ -32,7 +35,7 @@ public class AuditService {
      * @param entityId the primary entity involved(e.g: shipName, bayNumber, etc.)
      * @param detail any extra details
      */
-    public static void log(Action action, String entityId, String detail){
+    public void log(Action action, String entityId, String detail){
         // Format: timestamp, action, entityId, detail
         audit.info("{},{},{},\"{}\"",
                 Instant.now(),
@@ -41,7 +44,8 @@ public class AuditService {
                 detail != null ? detail.replace("\"","\"\"" ) : ""
     );
     }
+
     public static void log(Action action, String entityId){
-        log(action, entityId, null);
+        getInstance().log(action, entityId, null);
     }
 }

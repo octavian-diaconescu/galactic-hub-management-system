@@ -16,7 +16,6 @@ import java.util.stream.Collectors;
 
 @Entity
 @Table(name = "cargo_ship")
-@DiscriminatorValue("CARGO")
 // Heavy hauler space vehicle
 public class CargoShip extends SpaceShip {
     @Column(name = "max_cargo_weight", nullable = false)
@@ -88,7 +87,7 @@ public class CargoShip extends SpaceShip {
                         e -> e.addQuantity(quantity),
                         () -> cargoManifestLine.add(new CargoManifestEntry(this, item, quantity)));
         logger.info("[LOGISTICS] Loaded {} with [{}] x '{}'", this.getName(), quantity, item.getName());
-        AuditService.log(AuditService.Action.CARGO_LOADED, this.getName(), "Loaded with " + quantity + " x '" + item.getName());
+        AuditService.getInstance().log(AuditService.Action.CARGO_LOADED, this.getName(), "Loaded with " + quantity + " x '" + item.getName());
 //        System.out.printf("[LOGISTICS] Loaded %s with [%d] x '%s' %n", this.getName(), quantity, item.getName());
     }
 

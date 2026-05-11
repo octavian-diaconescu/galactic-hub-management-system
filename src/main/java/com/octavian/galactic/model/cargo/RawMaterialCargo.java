@@ -5,7 +5,6 @@ import jakarta.persistence.*;
 //TODO: instantiate class
 @Entity
 @Table(name = "raw_material_cargo")
-@DiscriminatorValue("RAW_MAT")
 public class RawMaterialCargo extends CargoItem {
     private static final double HIGH_PURITY_THRESHOLD = 90.0;
 
@@ -39,14 +38,17 @@ public class RawMaterialCargo extends CargoItem {
         this.purityPercentage = purityPercentage;
     }
 
+    @SuppressWarnings("unused")
     public StateOfMatter getStateOfMatter() {
         return stateOfMatter;
     }
 
+    @SuppressWarnings("unused")
     public double getPurityPercentage() {
         return purityPercentage;
     }
 
+    @SuppressWarnings("unused")
     public boolean isHighPurity() {
         return purityPercentage >= HIGH_PURITY_THRESHOLD;
     }

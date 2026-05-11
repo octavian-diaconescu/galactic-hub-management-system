@@ -5,9 +5,9 @@ public enum MissionType {
     EXPLORE("ScoutShip"),
     HAUL("CargoShip");
 
-    public final String description;
+    public final String shipRecommendation;
 
-    private MissionType(String description) {
-        this.description = description;
+    MissionType(String description) {
+        this.shipRecommendation = description;
     }
 }

@@ -10,7 +10,6 @@ import org.slf4j.LoggerFactory;
 
 @Entity
 @Table(name = "fighter_ship")
-@DiscriminatorValue("FIGHTER")
 public class FighterShip extends SpaceShip {
     private static final Logger logger = LoggerFactory.getLogger(FighterShip.class);
 
@@ -92,6 +91,7 @@ public class FighterShip extends SpaceShip {
         weaponsArmed = true;
     }
 
+    @SuppressWarnings("unused")
     public void unarmWeapons() {
         weaponsArmed = false;
         logger.info("[COMBAT] '{}' has been unarmed.", this.getName());
@@ -142,7 +142,7 @@ public class FighterShip extends SpaceShip {
 
         return (fuelFactor + hullFactor + shieldFactor + ammoFactor) / 4;
     }
-
+    @SuppressWarnings("unused")
     public void printCombatStatus() {
         logger.info("[COMBAT-STATUS] Fighter '{}' | Weapon: {} | Shield: {} | Ammo: {} | Armed: {} | Readiness: {}%",
                 this.getName(), primaryWeapon, shieldStrength,
@@ -151,18 +151,19 @@ public class FighterShip extends SpaceShip {
                 String.format("%.0f", getCombatReadiness() * 100));
     }
 
+    @SuppressWarnings("unused")
     public WeaponClass getPrimaryWeapon() {
         return primaryWeapon;
     }
-
+    @SuppressWarnings("unused")
     public boolean isWeaponsArmed() {
         return weaponsArmed;
     }
-
+    @SuppressWarnings("unused")
     public int getAmmunitionCount() {
         return ammunitionCount;
     }
-
+    @SuppressWarnings("unused")
     public int getShieldStrength() {
         return shieldStrength;
     }

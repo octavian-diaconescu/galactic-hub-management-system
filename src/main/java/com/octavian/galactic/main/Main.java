@@ -33,8 +33,7 @@ public class Main {
 
     private static final String PERSISTENCE_UNIT = "com.octavian.galactic";
 
-
-    public static void main(String[] args) {
+    public static void main(@SuppressWarnings("unused") String[] args) {
         try {
             hub = new HubService("Omega Station", fuelDepot, shipRepository, dockingRepository);
             knownBays = dockingRepository.findAll();
@@ -184,15 +183,7 @@ public class Main {
     }
 
     private static void handleDocking() {
-        Set<UUID> dockedShipIds = hub.getBaysByStatus(true).stream()
-                .map(DockingBay::getSpaceShip)
-                .filter(Objects::nonNull)
-                .map(SpaceShip::getId)
-                .collect(HashSet::new, HashSet::add, HashSet::addAll);
-
-        List<SpaceShip> ships = shipRepository.findAll().stream()
-                .filter(s -> !dockedShipIds.contains(s.getId()))
-                .toList();
+        List<SpaceShip> ships = shipRepository.findUndockedShips();
 
         System.out.println("\n--- INCOMING SHIPS ---");
         if (ships.isEmpty()) {

@@ -17,7 +17,6 @@ import java.util.UUID;
 @Entity
 @Table(name = "spaceship")
 @Inheritance(strategy = InheritanceType.JOINED)
-@DiscriminatorColumn(name = "ship_type", discriminatorType = DiscriminatorType.STRING)
 // The base for all flying vehicles
 public abstract class SpaceShip extends SpaceEntity implements Fuellable {
     private static final Logger logger = LoggerFactory.getLogger(SpaceShip.class);

@@ -22,7 +22,6 @@ public class CargoRepository implements BaseRepository<CargoItem> {
         }
     }
 
-    //TODO: refactor findAll with more specific methods that filter the data at the database level.
     @Override
     public List<CargoItem> findAll() {
         try (EntityManager em = emf.createEntityManager()) {
