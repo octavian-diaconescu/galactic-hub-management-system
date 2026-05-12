@@ -6,8 +6,11 @@ import com.octavian.galactic.model.cargo.CargoItem;
 import com.octavian.galactic.model.cargo.HazardousCargo;
 import com.octavian.galactic.model.spaceship.*;
 import com.octavian.galactic.model.station.*;
+import com.octavian.galactic.model.station.FuelDepot;
 import com.octavian.galactic.repository.DockingBayRepository;
+import com.octavian.galactic.repository.FuelDepotRepository;
 import com.octavian.galactic.repository.ShipRepository;
+import org.javatuples.Pair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -24,10 +27,14 @@ public class HubService {
     private final FuelDepot fuelDepot;
     private final ShipRepository shipRepository;
     private final DockingBayRepository dockingBayRepository;
+    private final FuelDepotRepository fuelDepotRepository;
 
-    private Integer dockingBayNumber = 0; // For now, to prevent another O(n) search, the dockingBayNumber represents the manufacturing number
-    // not an ordinal number, like in a parking lot. I would have to know which bay numbers previously existed and were unassigned
-    // (like 1 2 x 4 x 6 7) and choose the first empty one to occupy.
+    /**
+     * For now, to prevent another O(n) search, the dockingBayNumber represents the manufacturing number,
+     * not an ordinal number, like in a parking lot. I would have to know which bay numbers previously existed and were unassigned
+     * (like 1 2 x 4 x 6 7) and choose the first empty one to occupy.
+     */
+    private Integer dockingBayNumber = 0;
 
     public HubService(String name, FuelDepot fuelDepot) {
         this.name = name;
@@ -35,9 +42,10 @@ public class HubService {
         this.fuelDepot = fuelDepot;
         this.shipRepository = null;
         this.dockingBayRepository = null;
+        this.fuelDepotRepository = null;
     }
 
-    public HubService(String name, FuelDepot fuelDepot, ShipRepository shipRepository, DockingBayRepository dockingBayRepository) {
+    public HubService(String name, FuelDepot fuelDepot, ShipRepository shipRepository, DockingBayRepository dockingBayRepository, FuelDepotRepository fuelDepotRepository) {
         this.name = name;
         if (fuelDepot == null) throw new IllegalArgumentException("Fuel depot cannot be null");
         this.fuelDepot = fuelDepot;
@@ -45,6 +53,8 @@ public class HubService {
         this.shipRepository = shipRepository;
         if (dockingBayRepository == null) throw new IllegalArgumentException("Docking bay repository cannot be null");
         this.dockingBayRepository = dockingBayRepository;
+        if (fuelDepotRepository == null) throw new IllegalArgumentException("Fuel depot repository cannot be null");
+        this.fuelDepotRepository = fuelDepotRepository;
 
         registeredShips = getPersistedShips();
         dockingBays = getPersistedBays();
@@ -81,7 +91,7 @@ public class HubService {
             dockingBays.put(dockingBay.getBayNumber(), dockingBay);
         }
 
-        AuditService.log(AuditService.Action.BAY_ADDED, dockingBay.getName());
+        AuditService.getInstance().log(AuditService.Action.BAY_ADDED, dockingBay.getName());
     }
 
     public void removeDockingBay(UUID id) {
@@ -474,6 +484,9 @@ public class HubService {
                 int dispensable = Math.min(fuelNeeded, fuelDepot.getFuelLevel());
                 fuelDepot.dispenseFuel(dockedShip, dispensable);
                 fuelNeeded = dispensable; // Bill only for what was actually dispensed
+                if (fuelDepotRepository != null) {
+                    fuelDepotRepository.update(fuelDepot);
+                }
             }
         }
         if (repairsNeeded > 0) dockedShip.setHullIntegrity(100);
@@ -507,7 +520,7 @@ public class HubService {
             totalRevenue += calculateDockingFeesPerShip(bay.getSpaceShip().getId());
         }
 
-        logger.info("[HUB-BILLING] End of day report: Total Station Revenue = {} credits.%n", String.format("%.2f", totalRevenue));
+        logger.info("[HUB-BILLING] End of day report: Total Station Revenue = {} credits.", String.format("%.2f", totalRevenue));
         return totalRevenue;
     }
 
@@ -620,12 +633,24 @@ public class HubService {
         occupiedBays.forEach(bay -> {
             SpaceShip ship = bay.getSpaceShip();
             bay.undockSpaceShip();
-            AuditService.log(AuditService.Action.EMERGENCY_EVACUATION, bay.getName());
+            AuditService.getInstance().log(AuditService.Action.EMERGENCY_EVACUATION, bay.getName());
             if (dockingBayRepository != null) {
                 dockingBayRepository.update(bay);
                 shipRepository.update(ship);
             }
         });
         logger.info("[HUB] EMERGENCY OVERRIDE: Successfully evacuated {} personnel", totalEvacuated);
+    }
+
+    public Pair<Integer, Integer> fuelDepotStats(FuelDepot fuelDepot) {
+        Pair<Integer, Integer> fuelDepotDetails = Pair.with(-1, -1);
+        if (fuelDepot != null) {
+            fuelDepotDetails = fuelDepotDetails.setAt0(fuelDepot.getFuelLevel());
+            fuelDepotDetails = fuelDepotDetails.setAt1(fuelDepot.getFuelCapacity());
+        }
+        else{
+            throw new IllegalStateException("Fuel depot cannot be null");
+        }
+        return fuelDepotDetails;
     }
 }

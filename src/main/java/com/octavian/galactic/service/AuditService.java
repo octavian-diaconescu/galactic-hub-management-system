@@ -26,7 +26,8 @@ public class AuditService {
         HAZARD_SCAN,
         MISSION_DISPATCHED,
         BILLING_GENERATED,
-        EMERGENCY_EVACUATION
+        EMERGENCY_EVACUATION,
+        FUEL_DEPOT_REFUELED
     }
 
     /**
@@ -45,7 +46,7 @@ public class AuditService {
     );
     }
 
-    public static void log(Action action, String entityId){
+    public void log(Action action, String entityId){
         getInstance().log(action, entityId, null);
     }
 }

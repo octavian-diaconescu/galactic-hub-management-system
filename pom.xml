@@ -90,6 +90,14 @@
             <version>1.5.32</version>
             <scope>compile</scope>
         </dependency>
+
+        <!-- Source: https://mvnrepository.com/artifact/org.javatuples/javatuples -->
+        <dependency>
+            <groupId>org.javatuples</groupId>
+            <artifactId>javatuples</artifactId>
+            <version>1.2</version>
+            <scope>compile</scope>
+        </dependency>
     </dependencies>
 
     <build>

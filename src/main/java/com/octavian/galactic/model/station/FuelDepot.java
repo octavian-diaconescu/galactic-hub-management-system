@@ -10,7 +10,6 @@ import jakarta.persistence.Table;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-//TODO: persist FuelDepot class
 @Entity
 @Table(name = "fuel_depot")
 public class FuelDepot extends SpaceEntity implements Fuellable {

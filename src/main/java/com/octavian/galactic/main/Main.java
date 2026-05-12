@@ -2,18 +2,23 @@ package com.octavian.galactic.main;
 
 import com.octavian.galactic.exception.InsufficientContainmentException;
 import com.octavian.galactic.model.Size;
-import com.octavian.galactic.model.cargo.*;
+import com.octavian.galactic.model.cargo.CargoItem;
+import com.octavian.galactic.model.cargo.HazardousCargo;
 import com.octavian.galactic.model.mission.Mission;
 import com.octavian.galactic.model.mission.MissionType;
 import com.octavian.galactic.model.spaceship.*;
 import com.octavian.galactic.model.station.*;
 import com.octavian.galactic.repository.CargoRepository;
 import com.octavian.galactic.repository.DockingBayRepository;
+import com.octavian.galactic.repository.FuelDepotRepository;
 import com.octavian.galactic.repository.ShipRepository;
-import com.octavian.galactic.service.*;
+import com.octavian.galactic.service.AuditService;
+import com.octavian.galactic.service.HubService;
+import com.octavian.galactic.service.MissionDispatcher;
 import io.github.cdimascio.dotenv.Dotenv;
 import jakarta.persistence.EntityManagerFactory;
 import jakarta.persistence.Persistence;
+import org.javatuples.Pair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -22,7 +27,7 @@ import java.util.*;
 public class Main {
     private static final Logger logger = LoggerFactory.getLogger(Main.class);
     private static final Scanner scanner = new Scanner(System.in);
-    private static final FuelDepot fuelDepot = new FuelDepot("Omega F-Depot", 10000, 8000);
+    private static FuelDepot fuelDepot;
     private static HubService hub;
     private static List<DockingBay> knownBays = new ArrayList<>();
 
@@ -30,12 +35,22 @@ public class Main {
     private static final DockingBayRepository dockingRepository = new DockingBayRepository(emf);
     private static final ShipRepository shipRepository = new ShipRepository(emf);
     private static final CargoRepository cargoRepository = new CargoRepository(emf);
+    private static final FuelDepotRepository fuelDepotRepository = new FuelDepotRepository(emf);
 
     private static final String PERSISTENCE_UNIT = "com.octavian.galactic";
 
     public static void main(@SuppressWarnings("unused") String[] args) {
         try {
-            hub = new HubService("Omega Station", fuelDepot, shipRepository, dockingRepository);
+            fuelDepot = fuelDepotRepository.findAll().stream().findFirst()
+                    .orElseGet(() -> {
+                        FuelDepot seeded = new FuelDepot("Omega F-Depot", 10000, 8000);
+                        fuelDepotRepository.save(seeded);
+                        logger.info("Seeded fuel depot '{}' with {}/{} units",
+                                seeded.getName(), seeded.getFuelLevel(), seeded.getFuelCapacity());
+                        return seeded;
+                    });
+
+            hub = new HubService("Omega Station", fuelDepot, shipRepository, dockingRepository, fuelDepotRepository);
             knownBays = dockingRepository.findAll();
 
             initializeStation();
@@ -84,37 +99,36 @@ public class Main {
             hub.buildDockingBay(new DockingBay("Commercial-Medium", Size.MEDIUM, false));
             hub.buildDockingBay(new DockingBay("Heavy-Hauler-Large", Size.LARGE, false));
 
-        // Create Ships (with missing fuel/hull for billing demonstration)
-        CargoShip freighter = new CargoShip.Builder("USG Ishimura", Size.LARGE)
-                .fuelLevel(40)
-                .hullIntegrity(60)
-                .maxCrewCapacity(10)
-                .maxCargoWeight(50000)
-                .build();
-        freighter.addCrewMember(new CrewMember("Isaac Clarke", CrewMember.Rank.ENGINEER, CrewMember.Species.HUMAN));
-        try {
-            CargoItem cargo = new HazardousCargo("Marker Fragment", 50.0, 100, "Lead-lined", "Highly volatile alien artifact");
-            freighter.addCargoItem(cargo, 1);
+            // Create Ships (with missing fuel/hull for billing demonstration)
+            CargoShip freighter = new CargoShip.Builder("USG Ishimura", Size.LARGE)
+                    .fuelLevel(40)
+                    .hullIntegrity(60)
+                    .maxCrewCapacity(10)
+                    .maxCargoWeight(50000)
+                    .build();
+            freighter.addCrewMember(new CrewMember("Isaac Clarke", CrewMember.Rank.ENGINEER, CrewMember.Species.HUMAN));
+            try {
+                CargoItem cargo = new HazardousCargo("Marker Fragment", 50.0, 100, "Lead-lined", "Highly volatile alien artifact");
+                freighter.addCargoItem(cargo, 1);
 
-            cargoRepository.save(cargo);
-        } catch (InsufficientContainmentException i) {
-            logger.error("[INIT] Containment check failed: {}", i.getMessage());
-            System.out.println(i.getMessage());
-        }
+                cargoRepository.save(cargo);
+            } catch (InsufficientContainmentException i) {
+                logger.error("[INIT] Containment check failed: {}", i.getMessage());
+                System.out.println(i.getMessage());
+            }
 
-        ScoutShip fighter = new ScoutShip.Builder("Swordfish II", Size.SMALL)
-                .fuelLevel(80)
-                .hullIntegrity(95)
-                .maxCrewCapacity(2)
-                .sensorRange(500)
-                .build();
-        fighter.addCrewMember(new CrewMember("Spike Spiegel", CrewMember.Rank.COMMANDER, CrewMember.Species.HUMAN));
+            ScoutShip fighter = new ScoutShip.Builder("Swordfish II", Size.SMALL)
+                    .fuelLevel(80)
+                    .hullIntegrity(95)
+                    .maxCrewCapacity(2)
+                    .sensorRange(500)
+                    .build();
+            fighter.addCrewMember(new CrewMember("Spike Spiegel", CrewMember.Rank.COMMANDER, CrewMember.Species.HUMAN));
 
-        // Register Ships
-        hub.registerShip(freighter);
-        hub.registerShip(fighter);
-        }
-        else{
+            // Register Ships
+            hub.registerShip(freighter);
+            hub.registerShip(fighter);
+        } else {
             logger.info("Loaded {} docking bays from database.", knownBays.size());
             System.out.println("Loaded " + knownBays.size() + " docking bays from database.");
             int shipCount = shipRepository.findAll().size();
@@ -143,22 +157,24 @@ public class Main {
             System.out.println(" 8. Run End-of-Day Billing");
             System.out.println(" 9. Dispatch Ship on Mission");
             System.out.println("10. Trigger Emergency Evacuation");
+            System.out.println("11. Manage fuel depot");
             System.out.println(" 0. Exit Terminal");
             System.out.print("Select an option: ");
 
             String input = scanner.nextLine().strip();
 
             switch (input) {
-                case "1" -> { viewStationStatus(); waitForEnter(); }
-                case "2" -> { viewDockedShipStats(); waitForEnter(); }
-                case "3" -> { handleDocking(); waitForEnter(); }
-                case "4" -> { handleUndocking(); waitForEnter(); }
-                case "5" -> { handleHazardScan(); waitForEnter(); }
-                case "6" -> { handleFindHeaviestCargo(); waitForEnter(); }
-                case "7" -> { handlePersonnelReport(); waitForEnter(); }
-                case "8" -> { hub.calculateTotalDockingFees(); waitForEnter(); }
-                case "9" -> { handleMissionDispatch(); waitForEnter(); }
-                case "10" -> { hub.emergencyEvacuation(); waitForEnter(); }
+                case "1" -> {viewStationStatus();waitForEnter();}
+                case "2" -> {viewDockedShipStats();waitForEnter();}
+                case "3" -> {handleDocking();waitForEnter();}
+                case "4" -> {handleUndocking();waitForEnter();}
+                case "5" -> {handleHazardScan();waitForEnter();}
+                case "6" -> {handleFindHeaviestCargo();waitForEnter();}
+                case "7" -> {handlePersonnelReport();waitForEnter();}
+                case "8" -> {hub.calculateTotalDockingFees();waitForEnter();}
+                case "9" -> {handleMissionDispatch();waitForEnter();}
+                case "10" -> {hub.emergencyEvacuation();waitForEnter();}
+                case "11" -> {manageFuelDepot();waitForEnter();}
                 case "0" -> {
                     logger.info("Terminal shutdown requested.");
                     System.out.println("Shutting down terminal. Goodbye.");
@@ -399,5 +415,50 @@ public class Main {
             logger.error("[MENU] Heaviest cargo search error: {}", e.getMessage());
             System.out.println("Error: " + e.getMessage());
         }
+    }
+
+    private static void manageFuelDepot() {
+        try {
+            fuelDepot = fuelDepotRepository.findAll().getFirst();
+        } catch (NoSuchElementException e) {
+            logger.warn("[MENU] Fuel depot not found");
+        }
+
+        System.out.println("\n--- MANAGE FUEL DEPOT ---");
+        System.out.println("Fuel depot: " + fuelDepot.getName());
+
+        Pair<Integer, Integer> fuelDepotInfo = Pair.with(-1, -1);
+        try {
+            fuelDepotInfo = hub.fuelDepotStats(fuelDepot);
+        } catch (IllegalStateException e) {
+            logger.error("[MENU] Fuel depot not found");
+        }
+        int fuelLevel = fuelDepotInfo.getValue0();
+        int fuelCapacity = fuelDepotInfo.getValue1();
+
+        logger.info("Fuel depot: {}. Fuel: {} out of {} ({}% left)", fuelDepot.getName(), fuelLevel, fuelCapacity, (fuelLevel / fuelCapacity) * 100);
+        System.out.printf("Fuel: %d out of %d (%d%% left)%n", fuelLevel, fuelCapacity, (fuelLevel / fuelCapacity) * 100);
+        System.out.println("Refuel? [Y/N]");
+
+        try {
+            String choice = String.join(" ", scanner.nextLine().split(" ")).trim().toLowerCase();
+            switch (choice) {
+                case "y" -> {
+                    fuelDepot.refuel(fuelCapacity);
+                    fuelDepotRepository.update(fuelDepot);
+                    logger.info("Fuel depot: {} refueled", fuelDepot.getName());
+                    AuditService.getInstance().log(AuditService.Action.FUEL_DEPOT_REFUELED, fuelDepot.getName());
+                }
+                case "n" -> {
+                }
+                default -> throw new IllegalArgumentException("Invalid choice");
+            }
+        } catch (NumberFormatException e) {
+            logger.warn("[MENU] Invalid string input for refuel option");
+        } catch (IllegalArgumentException e) {
+            logger.info("[MENU] Invalid choice: {}", e.getMessage());
+        }
+
+
     }
 }

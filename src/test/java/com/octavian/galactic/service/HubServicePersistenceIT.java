@@ -5,6 +5,7 @@ import com.octavian.galactic.model.spaceship.ScoutShip;
 import com.octavian.galactic.model.station.DockingBay;
 import com.octavian.galactic.model.station.FuelDepot;
 import com.octavian.galactic.repository.DockingBayRepository;
+import com.octavian.galactic.repository.FuelDepotRepository;
 import com.octavian.galactic.repository.ShipRepository;
 import com.octavian.galactic.support.AbstractPostgresJpaIT;
 import com.octavian.galactic.support.PostgresJpaTestSupport;
@@ -22,6 +23,8 @@ class HubServicePersistenceIT extends AbstractPostgresJpaIT {
         FuelDepot depot = new FuelDepot("Depot", 10_000, 8_000);
         ShipRepository shipRepository = new ShipRepository(PostgresJpaTestSupport.emf());
         DockingBayRepository bayRepository = new DockingBayRepository(PostgresJpaTestSupport.emf());
+        FuelDepotRepository fuelDepotRepository = new FuelDepotRepository(PostgresJpaTestSupport.emf());
+        fuelDepotRepository.save(depot);
 
         ScoutShip ship = new ScoutShip.Builder("Reloader", Size.SMALL)
                 .sensorRange(20)
@@ -32,10 +35,10 @@ class HubServicePersistenceIT extends AbstractPostgresJpaIT {
         bay.setBayNumber(1);
         bayRepository.save(bay);
 
-        HubService hub = new HubService("Station", depot, shipRepository, bayRepository);
+        HubService hub = new HubService("Station", depot, shipRepository, bayRepository, fuelDepotRepository);
         hub.assignShipToBay(ship.getId(), 1);
 
-        HubService reloaded = new HubService("Station", depot, shipRepository, bayRepository);
+        HubService reloaded = new HubService("Station", depot, shipRepository, bayRepository, fuelDepotRepository);
         assertTrue(reloaded.getDockingBays().get(1).isOccupied());
         assertEquals(ship.getId(), reloaded.getDockingBays().get(1).getSpaceShip().getId());
         assertTrue(reloaded.getRegisteredShips().stream().anyMatch(s -> s.getId().equals(ship.getId())));
