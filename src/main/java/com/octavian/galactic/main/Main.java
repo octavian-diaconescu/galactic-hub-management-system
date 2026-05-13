@@ -433,18 +433,18 @@ public class Main {
         } catch (IllegalStateException e) {
             logger.error("[MENU] Fuel depot not found");
         }
-        int fuelLevel = fuelDepotInfo.getValue0();
-        int fuelCapacity = fuelDepotInfo.getValue1();
+        double fuelLevel = (double)fuelDepotInfo.getValue0();
+        double fuelCapacity = (double)fuelDepotInfo.getValue1();
 
-        logger.info("Fuel depot: {}. Fuel: {} out of {} ({}% left)", fuelDepot.getName(), fuelLevel, fuelCapacity, (fuelLevel / fuelCapacity) * 100);
-        System.out.printf("Fuel: %d out of %d (%d%% left)%n", fuelLevel, fuelCapacity, (fuelLevel / fuelCapacity) * 100);
+        logger.info("Fuel depot: {}. Fuel: {} out of {} ({}% left)", fuelDepot.getName(), (int)fuelLevel, (int)fuelCapacity, (fuelLevel / fuelCapacity) * 100);
+        System.out.printf("Fuel: %d out of %d (%.2f%% left)%n", (int)fuelLevel, (int)fuelCapacity, (fuelLevel / fuelCapacity) * 100);
         System.out.println("Refuel? [Y/N]");
 
         try {
             String choice = String.join(" ", scanner.nextLine().split(" ")).trim().toLowerCase();
             switch (choice) {
                 case "y" -> {
-                    fuelDepot.refuel(fuelCapacity);
+                    fuelDepot.refuel((int)fuelCapacity);
                     fuelDepotRepository.update(fuelDepot);
                     logger.info("Fuel depot: {} refueled", fuelDepot.getName());
                     AuditService.getInstance().log(AuditService.Action.FUEL_DEPOT_REFUELED, fuelDepot.getName());
