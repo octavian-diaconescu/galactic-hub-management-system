@@ -16,13 +16,13 @@ Status guide:
 - [x] Inheritance across ship and cargo hierarchies
 - [x] Interface-based behavior (`Fuellable`)
 - [x] Multiple collections used across services and domain models (`List`, `Map`, etc.)
-- [ ] At least one explicitly sorted collection structure (currently uses sorting logic, but not a dedicated sorted collection as a core store)
+- [x] At least one explicitly sorted collection structure
 - [x] Custom exceptions implemented and used in runtime flows
 - [x] Service layer exposing system operations (`HubService`, `MissionDispatcher`)
 - [x] Main entry point that drives the application (`Main`)
 - [x] Relational persistence integrated (JPA/Hibernate + PostgreSQL)
-- [ ] CRUD coverage for at least 6 object types (currently repository-backed for core aggregates, not 6 full CRUD services yet)
-- [ ] CSV audit service for executed actions
+- [x] CRUD coverage for at least 6 object types
+- [x] CSV audit service for executed actions
 - [ ] Graphical user interface
 
 ### Implemented Features Checklist
@@ -35,10 +35,10 @@ Status guide:
 - [x] Billing and maintenance simulation (fees, refuel, hull repairs)
 - [x] Emergency evacuation flow
 - [x] Mission dispatch with event-driven outcomes
-- [x] PostgreSQL-backed persistence for ships, bays, and cargo
+- [x] PostgreSQL-backed persistence for ships, bays, cargo, and fuel depot
 - [x] Unit and integration tests (including Testcontainers-based DB integration tests)
 
-### TODO's
+### Extras
 - [ ] AgriculturalCargo.java, ManufacturedCargo.java, RawMaterialCargo.java need concrete usages. Right now no object of those types are used in the project
 - [ ] Finish game logic
 - [ ] SpaceShip.java --> calculateFuelCost(int distance): refactor for ship sizes AND different ship types
@@ -75,6 +75,7 @@ Design patterns currently visible:
 - JUnit 6
 - Testcontainers
 - GitHub Actions CI
+- SLF4J
 
 ## Getting Started
 
@@ -131,8 +132,10 @@ src/
       model/          # domain entities and hierarchies
       repository/     # persistence repositories (JPA-based)
       service/        # business operations and mission dispatch
-    resources/META-INF/
-      persistence.xml # JPA persistence unit configuration
+    resources/
+        META-INF/
+        persistence.xml # JPA persistence unit configuration
+    logback.xml # Logger config
   test/
     java/com/octavian/galactic/
       ...             # unit and integration tests
@@ -142,7 +145,6 @@ pom.xml               # build and dependencies
 
 ## Current Gaps / Next Steps
 
-- [ ] Add an audit service that logs executed actions to CSV (`action_name,timestamp`)
 - [ ] Expand full CRUD service coverage to additional object types
 - [ ] Add a GUI layer
 - [ ] Add ERD documentation for the relational model
