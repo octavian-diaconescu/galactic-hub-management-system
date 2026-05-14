@@ -96,21 +96,33 @@ public class MissionResult {
     }
 
     public void printSummary() {
-        logger.info("""
+        logger.info(formatCliSummary());
+    }
+
+    /**
+     * Same content as {@link #printSummary()} logs, as a single plain-text block (for GUI / CLI-style display).
+     */
+    public String formatCliSummary() {
+        return """
                 
                 ========== MISSION REPORT ==========
-                Mission   : {}
-                Type      : {}
-                Event     : {}
-                Outcome   : {}
-                Credits   : +{}
-                Hull Dmg  : -{}
-                Fuel Used : -{}
-                Log       : {}
-                ====================================""",
-                mission.name(), mission.type(), event,
-                success ? "SUCCESS" : "FAILED",
-                String.format("%.0f", creditsEarned),
-                hullDamageTaken, fuelConsumed, narrative);
+                Mission   : %s
+                Type      : %s
+                Event     : %s
+                Outcome   : %s
+                Credits   : +%s
+                Hull Dmg  : -%d
+                Fuel Used : -%d
+                Log       : %s
+                ===================================="""
+                .formatted(
+                        mission.name(),
+                        mission.type(),
+                        event,
+                        success ? "SUCCESS" : "FAILED",
+                        String.format("%.0f", creditsEarned),
+                        hullDamageTaken,
+                        fuelConsumed,
+                        narrative);
     }
 }

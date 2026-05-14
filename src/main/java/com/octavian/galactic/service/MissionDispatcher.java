@@ -100,8 +100,8 @@ public class MissionDispatcher {
                     boolean mitigated = scout.getSensorRange() >= 200;
                     yield result
                             .success(mitigated)
-                            .hullDamageTaken(mitigated ? 0 : 15)
-                            .creditsEarned(mitigated ? mission.baseReward() : mission.baseReward() * 0.3)
+                            .hullDamageTaken(mitigated ? 5 : 15)
+                            .creditsEarned(mitigated ? mission.baseReward() * 1.5 : mission.baseReward() * 0.3)
                             .narrative(mitigated
                                     ? String.format("'%s' used superior sensors to navigate the nebula.", ship.getName())
                                     : String.format("'%s' lost in nebula interference. Low sensor range.", ship.getName()))
@@ -136,6 +136,8 @@ public class MissionDispatcher {
         MissionResult.Builder result = new MissionResult.Builder(mission, event)
                 .fuelConsumed(fuelCost);
 
+        double distanceBonus = mission.distance() * 0.75;
+
         if (ship instanceof CargoShip cargoShip) {
             double cargoWeight = cargoShip.getCargoManifest().entrySet().stream()
                     .mapToDouble(e -> e.getKey().getWeight() * e.getValue())
@@ -148,7 +150,7 @@ public class MissionDispatcher {
                     yield result
                             .success(true)
                             .hullDamageTaken(damage)
-                            .creditsEarned(mission.baseReward())
+                            .creditsEarned(mission.baseReward() * 1.2 + distanceBonus)
                             .narrative(String.format("'%s' navigated debris. Heavy load made maneuvering %s.",
                                     ship.getName(), heavyLoad ? "difficult" : "manageable"))
                             .build();
@@ -161,7 +163,7 @@ public class MissionDispatcher {
                         .build();
                 default -> result
                         .success(true)
-                        .creditsEarned(mission.baseReward() + cargoWeight * 0.1)
+                        .creditsEarned(mission.baseReward() + cargoWeight * 3.5 + distanceBonus)
                         .narrative(String.format("'%s' delivered %.1f tonnes. Event: %s",
                                 ship.getName(), cargoWeight, event))
                         .build();

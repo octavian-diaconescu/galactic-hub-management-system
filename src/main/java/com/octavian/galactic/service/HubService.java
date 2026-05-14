@@ -440,67 +440,92 @@ public class HubService {
     }
 
     public double calculateDockingFeesPerShip(UUID shipId) {
-        // Pricing Model Constants
+        return billDockedShipWithBreakdown(shipId).totalCredits();
+    }
+
+    /**
+     * Computes docking fee, refuels/repairs the ship, persists ship and depot, returns a printable breakdown.
+     */
+    public DockingFeeBreakdown billDockedShipWithBreakdown(UUID shipId) {
         final double FUEL_COST_PER_UNIT = 2.5;
         final double REPAIR_COST_PER_UNIT = 15.0;
 
         SpaceShip dockedShip = findDockedShipById(shipId);
+        String shipName = dockedShip.getName();
+        String shipType = dockedShip.getClass().getSimpleName();
 
-        int fuelNeeded = 100 - dockedShip.getFuelLevel();
-        int repairsNeeded = 100 - dockedShip.getHullIntegrity();
+        int initialFuelGap = 100 - dockedShip.getFuelLevel();
+        int initialRepairGap = 100 - dockedShip.getHullIntegrity();
 
-        double resourceCost = (fuelNeeded * FUEL_COST_PER_UNIT) + (repairsNeeded * REPAIR_COST_PER_UNIT);
+        double fuelLineCredits = initialFuelGap * FUEL_COST_PER_UNIT;
+        double repairLineCredits = initialRepairGap * REPAIR_COST_PER_UNIT;
+        double resourceCost = fuelLineCredits + repairLineCredits;
 
         double baseFee;
-        double serviceMultiplier; // Standard labor rate
+        double serviceMultiplier;
 
         switch (dockedShip) {
             case CargoShip _ -> {
-                baseFee = 500.0; // Heavy-duty docking fee
-                serviceMultiplier = 1.5; // Commercial surcharge for parts and labor
+                baseFee = 500.0;
+                serviceMultiplier = 1.5;
             }
             case ScoutShip _ -> {
                 baseFee = 100.0;
                 serviceMultiplier = 1.0;
-            } // Standard light docking fee
+            }
             case FighterShip _ -> {
                 baseFee = 200;
                 serviceMultiplier = 1.2;
             }
             default ->
-                    throw new IllegalArgumentException("Unknown ship type '" + dockedShip.getClass().getSimpleName() + "' — no billing rate defined");
+                    throw new IllegalArgumentException("Unknown ship type '" + shipType + "' — no billing rate defined");
         }
 
-        // Calculate final bill for this ship
         double shipTotalBill = baseFee + (resourceCost * serviceMultiplier);
 
-        // Perform the maintenance
-        if (fuelNeeded > 0) {
+        int fuelDispensed = 0;
+        if (initialFuelGap > 0) {
             if (fuelDepot.fuelTankIsEmpty()) {
                 logger.warn("[HUB-BILLING] Warning: depot empty, '{}' could not be refueled",
                         dockedShip.getName());
-                fuelNeeded = 0; // No fuel dispensed, don't bill for it
             } else {
-                int dispensable = Math.min(fuelNeeded, fuelDepot.getFuelLevel());
-                fuelDepot.dispenseFuel(dockedShip, dispensable);
-                fuelNeeded = dispensable; // Bill only for what was actually dispensed
+                fuelDispensed = Math.min(initialFuelGap, fuelDepot.getFuelLevel());
+                fuelDepot.dispenseFuel(dockedShip, fuelDispensed);
                 if (fuelDepotRepository != null) {
                     fuelDepotRepository.update(fuelDepot);
                 }
             }
         }
-        if (repairsNeeded > 0) dockedShip.setHullIntegrity(100);
+
+        int repairRestored = 0;
+        if (initialRepairGap > 0) {
+            repairRestored = initialRepairGap;
+            dockedShip.setHullIntegrity(100);
+        }
 
         if (shipRepository != null) {
             shipRepository.update(dockedShip);
         }
 
-        // I may want to decouple the invoice logic from the calculation of the docking fee
-        // Generate Invoice
-        logger.info("[HUB-BILLING] Invoice for ({})'{}' :\n ----> Base Fee: {}\n ----> Fuel Added: {} units | Repairs: {} units \n ----> Total Charged: {} credits", dockedShip.getClass().getSimpleName(), dockedShip.getName(), String.format("%.2f", baseFee), fuelNeeded, repairsNeeded, String.format("%.2f", shipTotalBill));
+        logger.info("[HUB-BILLING] Invoice for ({})'{}' :\n ----> Base Fee: {}\n ----> Fuel Added: {} units | Repairs: {} units \n ----> Total Charged: {} credits",
+                shipType, shipName, String.format("%.2f", baseFee), fuelDispensed, repairRestored, String.format("%.2f", shipTotalBill));
 
-        AuditService.getInstance().log(AuditService.Action.BILLING_GENERATED, dockedShip.getName(), dockedShip.getClass().getSimpleName());
-        return shipTotalBill;
+        AuditService.getInstance().log(AuditService.Action.BILLING_GENERATED, shipName, shipType);
+        return new DockingFeeBreakdown(
+                shipName,
+                shipType,
+                baseFee,
+                serviceMultiplier,
+                initialFuelGap,
+                initialRepairGap,
+                FUEL_COST_PER_UNIT,
+                REPAIR_COST_PER_UNIT,
+                fuelLineCredits,
+                repairLineCredits,
+                resourceCost,
+                fuelDispensed,
+                repairRestored,
+                shipTotalBill);
     }
 
 
