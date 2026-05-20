@@ -96,15 +96,16 @@ public class HubService {
 
     public void removeDockingBay(UUID id) {
         if (dockingBayRepository != null) {
-            DockingBay bay = dockingBayRepository.findById(id)
+            DockingBay bay = dockingBayRepository.findByIdWithShip(id)
                     .orElseThrow(() -> new DockingBayNotFoundException(id));
             if (bay.isOccupied()) {
-                logger.warn("[HUB] Error: Cannot remove Bay '{}'. A ship is currently docked!", bay.getBayNumber());
-            } else {
-                dockingBayRepository.delete(bay);
-                logger.info("[HUB] Successfully removed bay: {}", bay.getName());
-                AuditService.getInstance().log(AuditService.Action.BAY_REMOVED, bay.getName(), bay.getClass().getSimpleName());
+                String shipName = bay.getSpaceShip() != null ? bay.getSpaceShip().getName() : "a ship";
+                throw new IllegalStateException(
+                        "Cannot remove bay «" + bay.getName() + "»: " + shipName + " is still docked. Undock the ship first.");
             }
+            dockingBayRepository.delete(bay);
+            logger.info("[HUB] Successfully removed bay: {}", bay.getName());
+            AuditService.getInstance().log(AuditService.Action.BAY_REMOVED, bay.getName(), bay.getClass().getSimpleName());
             return;
         }
 
@@ -116,12 +117,16 @@ public class HubService {
         targetBay.ifPresentOrElse(
                 entry -> {
                     if (entry.getValue().isOccupied()) {
-                        logger.warn("[HUB] Error: Cannot remove Bay '{}'. A ship is currently docked!", entry.getKey());
-                    } else {
-                        dockingBays.remove(entry.getKey());
-                        logger.info("[HUB] Successfully removed bay: {}", entry.getValue().getName());
-                        AuditService.getInstance().log(AuditService.Action.BAY_REMOVED, entry.getValue().getName(), entry.getValue().getClass().getSimpleName());
+                        String shipName = entry.getValue().getSpaceShip() != null
+                                ? entry.getValue().getSpaceShip().getName()
+                                : "a ship";
+                        throw new IllegalStateException(
+                                "Cannot remove bay «" + entry.getValue().getName() + "»: "
+                                        + shipName + " is still docked. Undock the ship first.");
                     }
+                    dockingBays.remove(entry.getKey());
+                    logger.info("[HUB] Successfully removed bay: {}", entry.getValue().getName());
+                    AuditService.getInstance().log(AuditService.Action.BAY_REMOVED, entry.getValue().getName(), entry.getValue().getClass().getSimpleName());
                 },
                 () -> {
                     throw new DockingBayNotFoundException(id);

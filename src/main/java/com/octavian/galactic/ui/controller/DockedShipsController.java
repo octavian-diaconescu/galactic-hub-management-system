@@ -1,5 +1,6 @@
 package com.octavian.galactic.ui.controller;
 
+import com.octavian.galactic.model.SpaceEntity;
 import com.octavian.galactic.model.spaceship.CargoShip;
 import com.octavian.galactic.model.spaceship.SpaceShip;
 import com.octavian.galactic.model.station.DockingBay;
@@ -38,7 +39,7 @@ public class DockedShipsController implements RefreshablePanel {
         VBox.setVgrow(table, javafx.scene.layout.Priority.ALWAYS);
 
         table.getColumns().addAll(
-                col("Name", s -> s.getName(), 130),
+                col("Name", SpaceEntity::getName, 130),
                 col("Type", s -> s.getClass().getSimpleName(), 90),
                 col("Size", s -> s.getShipSize().toString(), 70),
                 col("Fuel", s -> s.getFuelLevel() + "%", 60),

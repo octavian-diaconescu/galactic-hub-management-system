@@ -4,49 +4,40 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-<BorderPane fx:id="root" xmlns="http://javafx.com/javafx/23" xmlns:fx="http://javafx.com/fxml/1"
+<BorderPane fx:id="root" xmlns="http://javafx.com/javafx/26" xmlns:fx="http://javafx.com/fxml/1"
             fx:controller="com.octavian.galactic.ui.controller.MainWindowController"
             stylesheets="@app.css">
     <top>
         <VBox>
             <MenuBar styleClass="top-menu-bar">
-                <menus>
-                    <Menu text="Station">
-                        <items>
-                            <MenuItem text="Dashboard" onAction="#onDashboard"/>
-                            <MenuItem text="Add docking bay" onAction="#onAddDockingBay"/>
-                            <MenuItem text="Register ship (factory)" onAction="#onRegisterShip"/>
-                            <SeparatorMenuItem/>
-                            <MenuItem text="End-of-Day Billing" onAction="#onBilling"/>
-                            <MenuItem text="Emergency Evacuation" onAction="#onEvacuation"/>
-                            <MenuItem text="Manage Fuel Depot" onAction="#onFuelDepot"/>
-                            <SeparatorMenuItem/>
-                            <MenuItem text="Exit" onAction="#onExit"/>
-                        </items>
-                    </Menu>
-                    <Menu text="Ships">
-                        <items>
-                            <MenuItem text="Docked Ship Stats" onAction="#onDockedShips"/>
-                            <SeparatorMenuItem/>
-                            <MenuItem text="Dock a Ship" onAction="#onDockShip"/>
-                            <MenuItem text="Undock a Ship" onAction="#onUndock"/>
-                            <SeparatorMenuItem/>
-                            <MenuItem text="Find Heaviest Cargo Ship" onAction="#onHeaviestCargo"/>
-                        </items>
-                    </Menu>
-                    <Menu text="Operations">
-                        <items>
-                            <MenuItem text="Dispatch Mission" onAction="#onMission"/>
-                            <MenuItem text="Hazard Scan" onAction="#onHazardScan"/>
-                            <MenuItem text="Personnel Report" onAction="#onPersonnel"/>
-                        </items>
-                    </Menu>
-                    <Menu text="Help">
-                        <items>
-                            <MenuItem text="About" onAction="#onAbout"/>
-                        </items>
-                    </Menu>
-                </menus>
+                <Menu text="Station">
+                    <MenuItem text="Dashboard" onAction="#onDashboard"/>
+                    <MenuItem text="Add docking bay" onAction="#onAddDockingBay"/>
+                    <MenuItem text="Remove docking bay" onAction="#onRemoveDockingBay"/>
+                    <MenuItem text="Register ship (factory)" onAction="#onRegisterShip"/>
+                    <SeparatorMenuItem/>
+                    <MenuItem text="End-of-Day Billing" onAction="#onBilling"/>
+                    <MenuItem text="Emergency Evacuation" onAction="#onEvacuation"/>
+                    <MenuItem text="Manage Fuel Depot" onAction="#onFuelDepot"/>
+                    <SeparatorMenuItem/>
+                    <MenuItem text="Exit" onAction="#onExit"/>
+                </Menu>
+                <Menu text="Ships">
+                    <MenuItem text="Docked Ship Stats" onAction="#onDockedShips"/>
+                    <SeparatorMenuItem/>
+                    <MenuItem text="Dock a Ship" onAction="#onDockShip"/>
+                    <MenuItem text="Undock a Ship" onAction="#onUndock"/>
+                    <SeparatorMenuItem/>
+                    <MenuItem text="Find Heaviest Cargo Ship" onAction="#onHeaviestCargo"/>
+                </Menu>
+                <Menu text="Operations">
+                    <MenuItem text="Dispatch Mission" onAction="#onMission"/>
+                    <MenuItem text="Hazard Scan" onAction="#onHazardScan"/>
+                    <MenuItem text="Personnel Report" onAction="#onPersonnel"/>
+                </Menu>
+                <Menu text="Help">
+                    <MenuItem text="About" onAction="#onAbout"/>
+                </Menu>
             </MenuBar>
             <HBox styleClass="tool-bar" alignment="CENTER_LEFT" spacing="8">
                 <padding>
@@ -60,28 +51,26 @@
         </VBox>
     </top>
     <center>
-        <SplitPane fx:id="mainSplit" styleClass="main-split" dividerPositions="0.28">
-            <items>
-                <VBox spacing="8" styleClass="left-panel">
-                    <padding>
-                        <Insets top="12" right="8" bottom="12" left="12"/>
-                    </padding>
-                    <Label text="DOCKING BAYS" styleClass="panel-section-title"/>
-                    <TableView fx:id="bayTable" styleClass="bay-table" VBox.vgrow="ALWAYS">
-                        <placeholder>
-                            <Label text="No docking bays"/>
-                        </placeholder>
-                        <columns>
-                            <TableColumn fx:id="bayNumCol" text="#" prefWidth="40"/>
-                            <TableColumn fx:id="bayNameCol" text="Name" prefWidth="120"/>
-                            <TableColumn fx:id="baySizeCol" text="Size" prefWidth="70"/>
-                            <TableColumn fx:id="bayStatusCol" text="Status" prefWidth="80"/>
-                            <TableColumn fx:id="bayShipCol" text="Ship" prefWidth="120"/>
-                        </columns>
-                    </TableView>
-                </VBox>
-                <BorderPane fx:id="contentPane" styleClass="content-pane"/>
-            </items>
+        <SplitPane fx:id="mainSplit" styleClass="main-split" dividerPositions="0.5">
+            <VBox spacing="8" styleClass="left-panel">
+                <padding>
+                    <Insets top="12" right="8" bottom="12" left="12"/>
+                </padding>
+                <Label text="DOCKING BAYS" styleClass="panel-section-title"/>
+                <TableView fx:id="bayTable" styleClass="bay-table" VBox.vgrow="ALWAYS">
+                    <placeholder>
+                        <Label text="No docking bays"/>
+                    </placeholder>
+                    <columns>
+                        <TableColumn fx:id="bayNumCol" text="#" prefWidth="40"/>
+                        <TableColumn fx:id="bayNameCol" text="Name" prefWidth="120"/>
+                        <TableColumn fx:id="baySizeCol" text="Size" prefWidth="70"/>
+                        <TableColumn fx:id="bayStatusCol" text="Status" prefWidth="80"/>
+                        <TableColumn fx:id="bayShipCol" text="Ship" prefWidth="120"/>
+                    </columns>
+                </TableView>
+            </VBox>
+            <BorderPane fx:id="contentPane" styleClass="content-pane"/>
         </SplitPane>
     </center>
     <bottom>

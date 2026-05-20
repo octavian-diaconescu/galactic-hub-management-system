@@ -49,7 +49,7 @@ public class HazardScanController implements RefreshablePanel {
                 if (loaded instanceof CargoShip csLoaded) {
                     csLoaded.getCargoManifest().forEach((item, qty) -> {
                         String flag = item.getClass().getSimpleName().contains("Hazardous") ? " HAZARDOUS" : "";
-                        sb.append(String.format("  - %s x%d (%.1f kg each)%s%n",
+                        sb.append(String.format("  - %s x%d (%.1f Tonnes each)%s%n",
                                 item.getName(), qty, item.getWeight(), flag));
                     });
                 }

@@ -22,6 +22,19 @@ public class DockingBayRepository implements BaseRepository<DockingBay> {
         }
     }
 
+    public Optional<DockingBay> findByIdWithShip(UUID id) {
+        try (EntityManager em = emf.createEntityManager()) {
+            return em.createQuery(
+                            "SELECT DISTINCT db FROM DockingBay db " +
+                                    "LEFT JOIN FETCH db.spaceShip " +
+                                    "WHERE db.id = :id",
+                            DockingBay.class)
+                    .setParameter("id", id)
+                    .getResultStream()
+                    .findFirst();
+        }
+    }
+
     public Optional<DockingBay> findByBayNumberWithShip(int bayNumber) {
         try (EntityManager em = emf.createEntityManager()) {
             return em.createQuery(

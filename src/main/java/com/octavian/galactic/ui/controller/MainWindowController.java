@@ -100,6 +100,7 @@ public class MainWindowController {
 
     @FXML private void onDashboard()      { showPanel("dashboard.fxml"); }
     @FXML private void onAddDockingBay()  { showPanel("add-docking-bay.fxml"); }
+    @FXML private void onRemoveDockingBay() { showPanel("remove-docking-bay.fxml"); }
     @FXML private void onRegisterShip()   { showPanel("register-ship.fxml"); }
     @FXML private void onBilling()        { showPanel("billing.fxml"); }
     @FXML private void onEvacuation()     { showPanel("evacuation.fxml"); }
@@ -126,10 +127,10 @@ public class MainWindowController {
         darkMode = !darkMode;
         if (darkMode) {
             root.getStyleClass().add(DARK_CLASS);
-            themeToggle.setText("☀  Light Mode");
+            themeToggle.setText("🔆Light Mode");
         } else {
             root.getStyleClass().remove(DARK_CLASS);
-            themeToggle.setText("🌙  Dark Mode");
+            themeToggle.setText("🌚Dark Mode");
         }
     }
 

@@ -1,5 +1,6 @@
 package com.octavian.galactic.ui.controller;
 
+import com.octavian.galactic.model.SpaceEntity;
 import com.octavian.galactic.model.station.CrewMember;
 import com.octavian.galactic.ui.AppContext;
 import com.octavian.galactic.ui.RefreshablePanel;
@@ -35,7 +36,7 @@ public class PersonnelController implements RefreshablePanel {
         table.setPrefHeight(380);
 
         table.getColumns().addAll(
-                col("Name", c -> c.getName(), 160),
+                col("Name", SpaceEntity::getName, 160),
                 col("Rank", c -> c.toString().replaceAll(".*\\((.*)\\).*", "$1"), 100),
                 col("Species", c -> c.getSpecies().toString(), 100)
         );
