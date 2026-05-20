@@ -2,7 +2,6 @@ package com.octavian.galactic.model.spaceship;
 
 import com.octavian.galactic.model.cargo.CargoItem;
 import jakarta.persistence.*;
-import org.hibernate.annotations.UuidGenerator;
 
 import java.util.UUID;
 
@@ -17,7 +16,7 @@ public class CargoManifestEntry {
     @JoinColumn(name = "cargo_ship_id", nullable = false)
     private CargoShip cargoShip;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JoinColumn(name = "cargo_item_id", nullable = false)
     private CargoItem cargoItem;
 

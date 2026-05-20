@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<VBox xmlns="http://javafx.com/javafx/23" xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="com.octavian.galactic.ui.controller.RemoveDockingBayController"
+      spacing="16">
+    <padding>
+        <Insets top="20" right="24" bottom="24" left="24"/>
+    </padding>
+    <Label text="Remove Docking Bay" styleClass="section-heading"/>
+    <Label text="Permanently deletes an empty bay from the station. If a ship is docked, undock it first (Ships → Undock a Ship)."
+           styleClass="info-label, secondary-text" wrapText="true"/>
+    <VBox spacing="10" styleClass="card">
+        <padding>
+            <Insets top="16" right="16" bottom="16" left="16"/>
+        </padding>
+        <Label text="Remove bay" styleClass="card-title"/>
+        <VBox fx:id="warningsBox" spacing="8"/>
+        <HBox spacing="12" alignment="CENTER_LEFT">
+            <Label text="Bay" styleClass="form-label" minWidth="140" maxWidth="140"/>
+            <ComboBox fx:id="bayPicker" maxWidth="Infinity" promptText="Select bay…" HBox.hgrow="ALWAYS"/>
+        </HBox>
+        <Label fx:id="occupancyHint" wrapText="true" styleClass="secondary-text"/>
+        <Button fx:id="removeBtn" text="Remove bay" styleClass="btn-danger" maxWidth="Infinity"
+                onAction="#onRemove"/>
+        <Label fx:id="feedback" wrapText="true" styleClass="feedback-idle"/>
+    </VBox>
+</VBox>

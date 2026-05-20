@@ -43,10 +43,10 @@ public class HeaviestCargoController implements RefreshablePanel {
             CargoShip ship = found.get();
             double weight = ship.getCargoManifest().entrySet().stream()
                     .mapToDouble(en -> en.getKey().getWeight() * en.getValue()).sum();
-            result.setText(String.format("✓  Heaviest: %s\n   Cargo weight: %.2f kg\n   Type: %s | Size: %s | Fuel: %d%%",
+            result.setText(String.format(" Heaviest: %s\n   Cargo weight: %.2f Tonnes\n   Type: %s | Size: %s | Fuel: %d%%",
                     ship.getName(), weight, ship.getClass().getSimpleName(), ship.getShipSize(), ship.getFuelLevel()));
             result.getStyleClass().setAll("feedback-success");
-            AppContext.setStatus("Heaviest: " + ship.getName() + " (" + String.format("%.1f", weight) + " kg)");
+            AppContext.setStatus("Heaviest: " + ship.getName() + " (" + String.format("%.1f", weight) + " Tonnes)");
         }
     }
 }
