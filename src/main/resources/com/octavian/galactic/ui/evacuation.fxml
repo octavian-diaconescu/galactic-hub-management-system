@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<VBox xmlns="http://javafx.com/javafx/23" xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="com.octavian.galactic.ui.controller.EvacuationController"
+      spacing="16">
+    <padding>
+        <Insets top="20" right="24" bottom="24" left="24"/>
+    </padding>
+    <Label text="Emergency Evacuation" styleClass="section-heading, text-danger"/>
+    <Label text="Immediately undocks all ships and evacuates all personnel. This action cannot be undone."
+           styleClass="info-label, secondary-text" wrapText="true"/>
+    <VBox spacing="10" styleClass="card">
+        <padding>
+            <Insets top="16" right="16" bottom="16" left="16"/>
+        </padding>
+        <Label text="Evacuation Control" styleClass="card-title"/>
+        <Label text="⚠  DANGER ZONE — ALL SHIPS WILL BE UNDOCKED" styleClass="danger-banner"
+               maxWidth="Infinity" alignment="CENTER">
+            <padding>
+                <Insets top="10" right="10" bottom="10" left="10"/>
+            </padding>
+        </Label>
+        <Button text="CONFIRM — Trigger Emergency Evacuation" styleClass="btn-danger" maxWidth="Infinity"
+                onAction="#onConfirm"/>
+        <Label fx:id="feedback" wrapText="true" styleClass="feedback-idle"/>
+    </VBox>
+</VBox>

@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<VBox xmlns="http://javafx.com/javafx/23" xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="com.octavian.galactic.ui.controller.FuelDepotController"
+      spacing="16">
+    <padding>
+        <Insets top="20" right="24" bottom="24" left="24"/>
+    </padding>
+    <Label text="Fuel Depot Management" styleClass="section-heading"/>
+    <VBox spacing="10" styleClass="card">
+        <padding>
+            <Insets top="16" right="16" bottom="16" left="16"/>
+        </padding>
+        <Label text="Depot Status" styleClass="card-title"/>
+        <Label fx:id="nameLabel" styleClass="info-label"/>
+        <Label fx:id="levelLabel" styleClass="info-label"/>
+        <Label fx:id="pctLabel" styleClass="info-label"/>
+        <ProgressBar fx:id="fuelBar" maxWidth="Infinity" styleClass="fuel-progress"/>
+        <Button fx:id="refuelBtn" text="Refuel to Capacity" styleClass="btn-primary" maxWidth="Infinity"
+                onAction="#onRefuel"/>
+        <Label fx:id="feedback" wrapText="true" styleClass="feedback-idle"/>
+    </VBox>
+</VBox>

@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<VBox xmlns="http://javafx.com/javafx/23" xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="com.octavian.galactic.ui.controller.DashboardController"
+      spacing="18">
+    <padding>
+        <Insets top="20" right="24" bottom="24" left="24"/>
+    </padding>
+    <Label text="Station Dashboard" styleClass="section-heading"/>
+    <HBox fx:id="statsRow" spacing="12" alignment="CENTER_LEFT"/>
+    <Separator/>
+    <Label fx:id="fuelLabel" styleClass="info-label"/>
+    <ProgressBar fx:id="fuelBar" maxWidth="Infinity" styleClass="fuel-progress"/>
+    <Label fx:id="fuelDetail" styleClass="info-label, secondary-text"/>
+    <Separator/>
+    <Label text="Use the menus above to dock ships, dispatch missions, run billing, and more."
+           styleClass="secondary-text, hint-label" wrapText="true"/>
+</VBox>

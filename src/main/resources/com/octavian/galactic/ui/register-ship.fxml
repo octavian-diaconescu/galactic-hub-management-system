@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<VBox xmlns="http://javafx.com/javafx/23" xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="com.octavian.galactic.ui.controller.RegisterShipController"
+      spacing="16">
+    <padding>
+        <Insets top="20" right="24" bottom="24" left="24"/>
+    </padding>
+    <Label text="Register ship (factory)" styleClass="section-heading"/>
+    <Label text="Uses SpaceShipFactory.createRandomArrival() — random type, size, stats, and name — then persists the ship so it can dock."
+           styleClass="info-label, secondary-text" wrapText="true"/>
+    <VBox spacing="10" styleClass="card">
+        <padding>
+            <Insets top="16" right="16" bottom="16" left="16"/>
+        </padding>
+        <Label text="Factory" styleClass="card-title"/>
+        <Button text="Generate &amp; register incoming ship" styleClass="btn-primary" maxWidth="Infinity"
+                onAction="#onGenerate"/>
+        <Label fx:id="feedback" wrapText="true" styleClass="feedback-idle"/>
+    </VBox>
+    <VBox spacing="10" styleClass="card">
+        <padding>
+            <Insets top="16" right="16" bottom="16" left="16"/>
+        </padding>
+        <Label text="Registered ship" styleClass="card-title"/>
+        <Label fx:id="detailsPlaceholder" text="Generate a ship to see its details here."
+               styleClass="secondary-text" wrapText="true"/>
+        <VBox fx:id="shipDetailsBox" spacing="10" visible="false" managed="false">
+            <HBox spacing="12" alignment="CENTER_LEFT">
+                <Label text="Name" styleClass="form-label" minWidth="140" maxWidth="140"/>
+                <Label fx:id="shipNameLabel" styleClass="info-label" wrapText="true" HBox.hgrow="ALWAYS"/>
+            </HBox>
+            <HBox spacing="12" alignment="CENTER_LEFT">
+                <Label text="Type" styleClass="form-label" minWidth="140" maxWidth="140"/>
+                <Label fx:id="shipTypeLabel" styleClass="info-label" HBox.hgrow="ALWAYS"/>
+            </HBox>
+            <HBox spacing="12" alignment="CENTER_LEFT">
+                <Label text="Size" styleClass="form-label" minWidth="140" maxWidth="140"/>
+                <Label fx:id="shipSizeLabel" styleClass="info-label" HBox.hgrow="ALWAYS"/>
+            </HBox>
+            <HBox spacing="12" alignment="CENTER_LEFT">
+                <Label text="Fuel" styleClass="form-label" minWidth="140" maxWidth="140"/>
+                <VBox spacing="4" HBox.hgrow="ALWAYS">
+                    <Label fx:id="shipFuelLabel" styleClass="info-label"/>
+                    <ProgressBar fx:id="shipFuelBar" maxWidth="Infinity" styleClass="fuel-progress"/>
+                </VBox>
+            </HBox>
+            <HBox spacing="12" alignment="CENTER_LEFT">
+                <Label text="Hull integrity" styleClass="form-label" minWidth="140" maxWidth="140"/>
+                <VBox spacing="4" HBox.hgrow="ALWAYS">
+                    <Label fx:id="shipHullLabel" styleClass="info-label"/>
+                    <ProgressBar fx:id="shipHullBar" maxWidth="Infinity" styleClass="fuel-progress"/>
+                </VBox>
+            </HBox>
+        </VBox>
+    </VBox>
+</VBox>

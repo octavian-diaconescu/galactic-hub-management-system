@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<VBox xmlns="http://javafx.com/javafx/23" xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="com.octavian.galactic.ui.controller.AddDockingBayController"
+      spacing="16">
+    <padding>
+        <Insets top="20" right="24" bottom="24" left="24"/>
+    </padding>
+    <Label text="Add Docking Bay" styleClass="section-heading"/>
+    <Label text="Creates a new empty bay and saves it to the database. Bay number is assigned by the hub."
+           styleClass="info-label, secondary-text" wrapText="true"/>
+    <VBox spacing="10" styleClass="card">
+        <padding>
+            <Insets top="16" right="16" bottom="16" left="16"/>
+        </padding>
+        <Label text="New bay" styleClass="card-title"/>
+        <HBox spacing="12" alignment="CENTER_LEFT">
+            <Label text="Name" styleClass="form-label" minWidth="140" maxWidth="140"/>
+            <TextField fx:id="nameField" promptText="Bay display name" styleClass="form-input" HBox.hgrow="ALWAYS"/>
+        </HBox>
+        <HBox spacing="12" alignment="CENTER_LEFT">
+            <Label text="Max ship size" styleClass="form-label" minWidth="140" maxWidth="140"/>
+            <ComboBox fx:id="sizePicker" maxWidth="Infinity" HBox.hgrow="ALWAYS"/>
+        </HBox>
+        <Button text="Create bay" styleClass="btn-primary" maxWidth="Infinity" onAction="#onCreate"/>
+        <Label fx:id="feedback" wrapText="true" styleClass="feedback-idle"/>
+    </VBox>
+</VBox>

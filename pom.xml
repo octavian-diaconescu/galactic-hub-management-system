@@ -12,8 +12,6 @@
         <maven.compiler.source>25</maven.compiler.source>
         <maven.compiler.target>25</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <!-- Used by JavaFX deps + javafx-maven-plugin; keep in sync -->
-        <javafx.version>23.0.1</javafx.version>
     </properties>
 
     <dependencyManagement>
@@ -104,12 +102,12 @@
         <dependency>
             <groupId>org.openjfx</groupId>
             <artifactId>javafx-controls</artifactId>
-            <version>${javafx.version}</version>
+            <version>26.0.1</version>
         </dependency>
         <dependency>
             <groupId>org.openjfx</groupId>
             <artifactId>javafx-fxml</artifactId>
-            <version>${javafx.version}</version>
+            <version>26.0.1</version>
         </dependency>
     </dependencies>
 
