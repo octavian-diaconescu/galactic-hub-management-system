@@ -23,7 +23,7 @@ Status guide:
 - [x] Relational persistence integrated (JPA/Hibernate + PostgreSQL)
 - [x] CRUD coverage for at least 6 object types
 - [x] CSV audit service for executed actions
-- [ ] Graphical user interface
+- [X] Graphical user interface
 
 ### Implemented Features Checklist
 
@@ -146,6 +146,6 @@ pom.xml               # build and dependencies
 ## Current Gaps / Next Steps
 
 - [ ] Expand full CRUD service coverage to additional object types
-- [ ] Add a GUI layer
-- [ ] Add ERD documentation for the relational model
+- [X] Add a GUI layer
+- [X] Add ERD documentation for the relational model
 - [ ] Harden persistence test coverage for update/delete and edge cases
