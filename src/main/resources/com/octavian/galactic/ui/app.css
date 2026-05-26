@@ -1,8 +1,3 @@
-/* ============================================================
-   Galactic Hub Management System — JavaFX Stylesheet
-   Light theme is the base; .dark-theme on root activates dark.
-   ============================================================ */
-
 /* ── Fonts & global reset ─────────────────────────────────── */
 .root {
     -fx-font-family: "Segoe UI", "Helvetica Neue", Arial, sans-serif;

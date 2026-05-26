@@ -42,7 +42,6 @@ public class MainWindowController {
     private Runnable contentRefresh = () -> {};
     private boolean darkMode = true;
 
-    /** Filled before refreshAll() after mission dispatch so MissionFormController can restore the CLI report. */
     static String pendingMissionCliReport;
 
     @FXML

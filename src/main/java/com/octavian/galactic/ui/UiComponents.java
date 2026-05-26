@@ -8,7 +8,6 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 
-/** Shared UI builders used by FXML controllers for dynamic content. */
 public final class UiComponents {
 
     private UiComponents() {}

@@ -92,19 +92,6 @@ public class DockingBayRepository implements BaseRepository<DockingBay> {
         }
     }
 
-    public List<DockingBay> findDockedCargoShipsWithCargo() {
-        try (EntityManager em = emf.createEntityManager()) {
-            return em.createQuery(
-                            "SELECT DISTINCT db FROM DockingBay db " +
-                                    "LEFT JOIN FETCH db.spaceShip s " +
-                                    "LEFT JOIN FETCH TREAT(s AS CargoShip).cargoManifestLine cme " +
-                                    "LEFT JOIN FETCH cme.cargoItem " +
-                                    "WHERE db.isOccupied = true AND TYPE(s) = CargoShip",
-                            DockingBay.class)
-                    .getResultList();
-        }
-    }
-
     @Override
     public List<DockingBay> findAll() {
         try (EntityManager em = emf.createEntityManager()) {
