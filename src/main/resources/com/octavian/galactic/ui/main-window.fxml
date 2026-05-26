@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<BorderPane fx:id="root" xmlns="http://javafx.com/javafx/26" xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="com.octavian.galactic.ui.controller.MainWindowController"
+            stylesheets="@app.css">
+    <top>
+        <VBox>
+            <MenuBar styleClass="top-menu-bar">
+                <Menu text="Station">
+                    <MenuItem text="Dashboard" onAction="#onDashboard"/>
+                    <MenuItem text="Add docking bay" onAction="#onAddDockingBay"/>
+                    <MenuItem text="Remove docking bay" onAction="#onRemoveDockingBay"/>
+                    <MenuItem text="Register ship (factory)" onAction="#onRegisterShip"/>
+                    <SeparatorMenuItem/>
+                    <MenuItem text="End-of-Day Billing" onAction="#onBilling"/>
+                    <MenuItem text="Emergency Evacuation" onAction="#onEvacuation"/>
+                    <MenuItem text="Manage Fuel Depot" onAction="#onFuelDepot"/>
+                    <SeparatorMenuItem/>
+                    <MenuItem text="Exit" onAction="#onExit"/>
+                </Menu>
+                <Menu text="Ships">
+                    <MenuItem text="Docked Ship Stats" onAction="#onDockedShips"/>
+                    <SeparatorMenuItem/>
+                    <MenuItem text="Dock a Ship" onAction="#onDockShip"/>
+                    <MenuItem text="Undock a Ship" onAction="#onUndock"/>
+                    <SeparatorMenuItem/>
+                    <MenuItem text="Find Heaviest Cargo Ship" onAction="#onHeaviestCargo"/>
+                </Menu>
+                <Menu text="Operations">
+                    <MenuItem text="Dispatch Mission" onAction="#onMission"/>
+                    <MenuItem text="Hazard Scan" onAction="#onHazardScan"/>
+                    <MenuItem text="Personnel Report" onAction="#onPersonnel"/>
+                </Menu>
+                <Menu text="Help">
+                    <MenuItem text="About" onAction="#onAbout"/>
+                </Menu>
+            </MenuBar>
+            <HBox styleClass="tool-bar" alignment="CENTER_LEFT" spacing="8">
+                <padding>
+                    <Insets top="5" right="14" bottom="5" left="14"/>
+                </padding>
+                <Button text="↻  Refresh" styleClass="toolbar-btn" onAction="#onRefresh"/>
+                <Region HBox.hgrow="ALWAYS"/>
+                <Label fx:id="themeToggle" text="☀  Light Mode" styleClass="theme-toggle"
+                       onMouseClicked="#onToggleTheme"/>
+            </HBox>
+        </VBox>
+    </top>
+    <center>
+        <SplitPane fx:id="mainSplit" styleClass="main-split" dividerPositions="0.5">
+            <VBox spacing="8" styleClass="left-panel">
+                <padding>
+                    <Insets top="12" right="8" bottom="12" left="12"/>
+                </padding>
+                <Label text="DOCKING BAYS" styleClass="panel-section-title"/>
+                <TableView fx:id="bayTable" styleClass="bay-table" VBox.vgrow="ALWAYS">
+                    <placeholder>
+                        <Label text="No docking bays"/>
+                    </placeholder>
+                    <columns>
+                        <TableColumn fx:id="bayNumCol" text="#" prefWidth="40"/>
+                        <TableColumn fx:id="bayNameCol" text="Name" prefWidth="120"/>
+                        <TableColumn fx:id="baySizeCol" text="Size" prefWidth="70"/>
+                        <TableColumn fx:id="bayStatusCol" text="Status" prefWidth="80"/>
+                        <TableColumn fx:id="bayShipCol" text="Ship" prefWidth="120"/>
+                    </columns>
+                </TableView>
+            </VBox>
+            <BorderPane fx:id="contentPane" styleClass="content-pane"/>
+        </SplitPane>
+    </center>
+    <bottom>
+        <HBox styleClass="status-bar" alignment="CENTER_LEFT">
+            <padding>
+                <Insets top="5" right="14" bottom="5" left="14"/>
+            </padding>
+            <Label fx:id="statusLabel" styleClass="status-text"/>
+        </HBox>
+    </bottom>
+</BorderPane>

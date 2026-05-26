@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<VBox xmlns="http://javafx.com/javafx/26" xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="com.octavian.galactic.ui.controller.AboutController"
+      spacing="16">
+    <padding>
+        <Insets top="20" right="24" bottom="24" left="24"/>
+    </padding>
+    <Label text="About" styleClass="section-heading"/>
+    <VBox spacing="14" styleClass="card">
+        <padding>
+            <Insets top="16" right="16" bottom="16" left="16"/>
+        </padding>
+        <Label text="How to Use" styleClass="card-title"/>
+        <Label styleClass="about-text" wrapText="true"
+               text="Omega Station is a hub for docking ships, running missions, and managing station resources. Use the menus at the top to open each screen; the left panel always lists your docking bays."/>
+
+        <Label text="Getting started" styleClass="form-label"/>
+        <Label styleClass="about-text" wrapText="true"
+               text="1. Station → Add docking bay — create bays sized SMALL, MEDIUM, or LARGE.&#10;2. Station → Register ship (factory) — add random incoming ships to the database.&#10;3. Ships → Dock a Ship — assign an undocked ship to an empty bay (the ship must fit the bay size).&#10;4. Station → Dashboard — review bay occupancy, fuel levels, and registered ships."/>
+
+        <Label text="Station menu" styleClass="form-label"/>
+        <Label styleClass="about-text" wrapText="true"
+               text="• End-of-Day Billing — bill all docked ships, refuel them from the depot, and repair hulls.&#10;• Manage Fuel Depot — view reserves and refuel the station depot to capacity.&#10;• Emergency Evacuation — immediately undock every ship (requires confirmation)."/>
+
+        <Label text="Ships menu" styleClass="form-label"/>
+        <Label styleClass="about-text" wrapText="true"
+               text="• Docked Ship Stats — table of ships currently in bays.&#10;• Undock a Ship — clear a bay by releasing its ship.&#10;• Find Heaviest Cargo Ship — search among docked ships or all registered cargo ships."/>
+
+        <Label text="Operations menu" styleClass="form-label"/>
+        <Label styleClass="about-text" wrapText="true"
+               text="• Dispatch Mission — pick a docked ship, mission type (PATROL, EXPLORE, HAUL), and distance. A successful dispatch undocks the ship; the report appears on the form.&#10;• Hazard Scan — scan docked cargo ships for hazardous materials.&#10;• Personnel Report — list crew across all known ships."/>
+
+        <Label text="Tips" styleClass="form-label"/>
+        <Label styleClass="about-text" wrapText="true"
+               text="• Click ↻ Refresh in the toolbar to reload the bay list and the current screen.&#10;• Use the theme toggle to switch between light and dark mode.&#10;• Messages and errors appear in the status bar at the bottom."/>
+    </VBox>
+</VBox>

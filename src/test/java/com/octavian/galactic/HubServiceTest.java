@@ -274,4 +274,30 @@ public class HubServiceTest {
         assertEquals(cargoShip, heaviest.get(), "RATS should be the heaviest ship");
     }
 
+    @Test
+    @DisplayName("Should find the heaviest docked CargoShip only among ships in bays")
+    void testFindHeaviestDockedCargoShip() {
+        ((CargoShip) cargoShip).addCargoItem(hc, 5);
+        cargoShip1.addCargoItem(hc, 1);
+
+        hubService.buildDockingBay(dockingBay);
+        hubService.buildDockingBay(dockingBay2);
+        hubService.registerShip(cargoShip);
+        hubService.registerShip(cargoShip1);
+
+        hubService.assignShipToBay(cargoShip.getId(), 1);
+        hubService.assignShipToBay(cargoShip1.getId(), 2);
+
+        Optional<CargoShip> heaviestDocked = hubService.findHeaviestCargoShip("docked");
+
+        assertTrue(heaviestDocked.isPresent());
+        assertEquals(cargoShip, heaviestDocked.get(), "RATS should be the heaviest docked ship");
+
+        hubService.unassignShipFromBay(cargoShip.getId());
+
+        Optional<CargoShip> afterUndock = hubService.findHeaviestCargoShip("docked");
+        assertTrue(afterUndock.isPresent());
+        assertEquals(cargoShip1, afterUndock.get(), "Only Alpha 1 remains docked");
+    }
+
 }

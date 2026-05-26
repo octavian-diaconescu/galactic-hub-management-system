@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<VBox xmlns="http://javafx.com/javafx/26" xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="com.octavian.galactic.ui.controller.PersonnelController"
+      spacing="16">
+    <padding>
+        <Insets top="20" right="24" bottom="24" left="24"/>
+    </padding>
+    <Label text="Personnel Report" styleClass="section-heading"/>
+    <Label text="All crew registered across known ships." styleClass="info-label, secondary-text"/>
+    <VBox fx:id="contentBox" spacing="16" VBox.vgrow="ALWAYS"/>
+</VBox>

@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<VBox xmlns="http://javafx.com/javafx/26" xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="com.octavian.galactic.ui.controller.DockShipFormController"
+      spacing="16">
+    <padding>
+        <Insets top="20" right="24" bottom="24" left="24"/>
+    </padding>
+    <Label text="Dock a Ship" styleClass="section-heading"/>
+    <Label text="Assign an undocked ship to an available docking bay." styleClass="info-label, secondary-text"/>
+    <VBox spacing="10" styleClass="card">
+        <padding>
+            <Insets top="16" right="16" bottom="16" left="16"/>
+        </padding>
+        <Label text="Dock Ship" styleClass="card-title"/>
+        <VBox fx:id="warningsBox" spacing="8"/>
+        <HBox spacing="12" alignment="CENTER_LEFT">
+            <Label text="Ship" styleClass="form-label" minWidth="140" maxWidth="140"/>
+            <ComboBox fx:id="shipPicker" maxWidth="Infinity" promptText="Select ship…" HBox.hgrow="ALWAYS"/>
+        </HBox>
+        <HBox spacing="12" alignment="CENTER_LEFT">
+            <Label text="Bay" styleClass="form-label" minWidth="140" maxWidth="140"/>
+            <ComboBox fx:id="bayPicker" maxWidth="Infinity" promptText="Select bay…" HBox.hgrow="ALWAYS"/>
+        </HBox>
+        <Label fx:id="dockSizeHint" wrapText="true" styleClass="secondary-text"/>
+        <Button fx:id="dockBtn" text="Dock Ship" styleClass="btn-primary" maxWidth="Infinity" defaultButton="true"
+                onAction="#onDock"/>
+        <Label fx:id="feedback" wrapText="true" styleClass="feedback-idle"/>
+    </VBox>
+</VBox>

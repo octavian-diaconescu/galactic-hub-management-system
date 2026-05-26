@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<VBox xmlns="http://javafx.com/javafx/26" xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="com.octavian.galactic.ui.controller.BillingController"
+      spacing="16">
+    <padding>
+        <Insets top="20" right="24" bottom="24" left="24"/>
+    </padding>
+    <Label text="End-of-Day Billing" styleClass="section-heading"/>
+    <Label text="Calculates docking fees, refuels ships from the depot, and repairs hulls."
+           styleClass="info-label, secondary-text"/>
+    <VBox spacing="10" styleClass="card">
+        <padding>
+            <Insets top="16" right="16" bottom="16" left="16"/>
+        </padding>
+        <Label text="Billing" styleClass="card-title"/>
+        <VBox fx:id="warningsBox" spacing="8"/>
+        <Label text="⚠  This will refuel and repair all docked ships. The fuel depot will be charged accordingly."
+               styleClass="info-note" wrapText="true">
+            <padding>
+                <Insets top="8" right="12" bottom="8" left="12"/>
+            </padding>
+        </Label>
+        <Button fx:id="runBtn" text="Run End-of-Day Billing" styleClass="btn-primary" maxWidth="Infinity"
+                onAction="#onRunBilling"/>
+        <TextArea fx:id="log" editable="false" prefRowCount="22" styleClass="log-area"/>
+        <Label fx:id="totalLabel" styleClass="stat-value, stat-success"/>
+    </VBox>
+</VBox>

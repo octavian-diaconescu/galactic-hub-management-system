@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<VBox xmlns="http://javafx.com/javafx/26" xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="com.octavian.galactic.ui.controller.MissionFormController"
+      spacing="16">
+    <padding>
+        <Insets top="20" right="24" bottom="24" left="24"/>
+    </padding>
+    <Label text="Dispatch Mission" styleClass="section-heading"/>
+    <Label text="Select a docked ship, choose a mission type and distance." styleClass="info-label, secondary-text"/>
+    <VBox spacing="10" styleClass="card">
+        <padding>
+            <Insets top="16" right="16" bottom="16" left="16"/>
+        </padding>
+        <Label text="Mission Parameters" styleClass="card-title"/>
+        <VBox fx:id="warningsBox" spacing="8"/>
+        <HBox spacing="12" alignment="CENTER_LEFT">
+            <Label text="Ship" styleClass="form-label" minWidth="140" maxWidth="140"/>
+            <ComboBox fx:id="shipPicker" maxWidth="Infinity" promptText="Select ship…" HBox.hgrow="ALWAYS"/>
+        </HBox>
+        <HBox spacing="12" alignment="CENTER_LEFT">
+            <Label text="Mission Type" styleClass="form-label" minWidth="140" maxWidth="140"/>
+            <ChoiceBox fx:id="typePicker" maxWidth="Infinity" styleClass="form-choice" HBox.hgrow="ALWAYS"/>
+        </HBox>
+        <HBox spacing="12" alignment="CENTER_LEFT">
+            <Label text="Distance (units)" styleClass="form-label" minWidth="140" maxWidth="140"/>
+            <TextField fx:id="distanceField" promptText="e.g. 500" styleClass="form-input" HBox.hgrow="ALWAYS"/>
+        </HBox>
+        <Label text="Recommended: PATROL → FighterShip · EXPLORE → ScoutShip · HAUL → CargoShip"
+               styleClass="secondary-text, hint-label"/>
+        <Button fx:id="dispatchBtn" text="Dispatch Mission" styleClass="btn-primary" maxWidth="Infinity"
+                onAction="#onDispatch"/>
+        <Label fx:id="missionError" wrapText="true" styleClass="feedback-idle"/>
+        <TextArea fx:id="missionReport" editable="false" wrapText="false" prefRowCount="16"
+                  promptText="Mission report will appear here after dispatch (same format as the CLI log)."
+                  styleClass="log-area"/>
+    </VBox>
+</VBox>

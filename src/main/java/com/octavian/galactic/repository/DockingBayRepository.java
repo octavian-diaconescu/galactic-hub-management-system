@@ -22,6 +22,19 @@ public class DockingBayRepository implements BaseRepository<DockingBay> {
         }
     }
 
+    public Optional<DockingBay> findByIdWithShip(UUID id) {
+        try (EntityManager em = emf.createEntityManager()) {
+            return em.createQuery(
+                            "SELECT DISTINCT db FROM DockingBay db " +
+                                    "LEFT JOIN FETCH db.spaceShip " +
+                                    "WHERE db.id = :id",
+                            DockingBay.class)
+                    .setParameter("id", id)
+                    .getResultStream()
+                    .findFirst();
+        }
+    }
+
     public Optional<DockingBay> findByBayNumberWithShip(int bayNumber) {
         try (EntityManager em = emf.createEntityManager()) {
             return em.createQuery(
@@ -76,19 +89,6 @@ public class DockingBayRepository implements BaseRepository<DockingBay> {
                     .setParameter("shipId", shipId)
                     .getResultStream()
                     .findFirst();
-        }
-    }
-
-    public List<DockingBay> findDockedCargoShipsWithCargo() {
-        try (EntityManager em = emf.createEntityManager()) {
-            return em.createQuery(
-                            "SELECT DISTINCT db FROM DockingBay db " +
-                                    "LEFT JOIN FETCH db.spaceShip s " +
-                                    "LEFT JOIN FETCH TREAT(s AS CargoShip).cargoManifestLine cme " +
-                                    "LEFT JOIN FETCH cme.cargoItem " +
-                                    "WHERE db.isOccupied = true AND TYPE(s) = CargoShip",
-                            DockingBay.class)
-                    .getResultList();
         }
     }
 
