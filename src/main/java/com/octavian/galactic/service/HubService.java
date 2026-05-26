@@ -587,11 +587,13 @@ public class HubService {
                     .max(Comparator.comparingDouble(this::calculateCargoWeight));
 
         } else if (filter.equalsIgnoreCase("docked")) {
-            if (dockingBayRepository != null) {
-                heaviestShip = dockingBayRepository.findDockedCargoShipsWithCargo().stream()
+            if (dockingBayRepository != null && shipRepository != null) {
+                heaviestShip = dockingBayRepository.findByOccupied(true).stream()
                         .map(DockingBay::getSpaceShip)
-                        .filter(ship -> ship instanceof CargoShip)
-                        .map(ship -> (CargoShip) ship)
+                        .filter(CargoShip.class::isInstance)
+                        .map(ship -> shipRepository.findByIdWithCargo(ship.getId()).orElse(ship))
+                        .filter(CargoShip.class::isInstance)
+                        .map(CargoShip.class::cast)
                         .max(Comparator.comparingDouble(this::calculateCargoWeight));
             } else {
                 if (dockingBays.isEmpty()) {

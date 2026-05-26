@@ -1,5 +1,6 @@
 package com.octavian.galactic.repository;
 
+import com.octavian.galactic.model.spaceship.CargoShip;
 import com.octavian.galactic.model.spaceship.SpaceShip;
 import com.octavian.galactic.model.station.CrewMember;
 import jakarta.persistence.EntityManager;
@@ -97,6 +98,21 @@ public class ShipRepository implements BaseRepository<SpaceShip> {
                                     "LEFT JOIN FETCH s.cargoManifestLine cme " +
                                     "LEFT JOIN FETCH cme.cargoItem",
                             SpaceShip.class)
+                    .getResultList();
+        }
+    }
+
+    public List<CargoShip> findDockedCargoShipsWithCargo() {
+        try (EntityManager em = emf.createEntityManager()) {
+            return em.createQuery(
+                            "SELECT DISTINCT cs FROM CargoShip cs " +
+                                    "LEFT JOIN FETCH cs.cargoManifestLine cme " +
+                                    "LEFT JOIN FETCH cme.cargoItem " +
+                                    "WHERE EXISTS (" +
+                                    "  SELECT 1 FROM DockingBay db " +
+                                    "  WHERE db.isOccupied = true AND db.spaceShip = cs" +
+                                    ")",
+                            CargoShip.class)
                     .getResultList();
         }
     }
