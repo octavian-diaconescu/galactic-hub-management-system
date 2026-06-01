@@ -20,12 +20,15 @@ public class CrewMember extends SpaceEntity implements Comparable<CrewMember> {
 
 
     public enum Rank {
-        COMMANDER,    // Top authority
-        OFFICER,      // Standard tactical/bridge staff
-        ENGINEER,     // Technical and maintenance staff
-        SPECIALIST,   // Science or medical experts
-        CIVILIAN,     // Non-military residents
-        GUEST         // Temporary visitors
+        COMMANDER("Top authority"),
+        OFFICER("Standard tactical/bridge staff"),
+        ENGINEER("Technical and maintenance staff"),
+        SPECIALIST("Science or medical experts"),
+        CIVILIAN("Non-military residents"),
+        GUEST("Temporary visitors");
+
+        public final String description;
+        Rank(String description) {this.description = description;}
     }
 
     public enum Species{
@@ -37,7 +40,8 @@ public class CrewMember extends SpaceEntity implements Comparable<CrewMember> {
     }
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "ship_id", nullable = true)
+    @JoinColumn(name = "ship_id")
+    @SuppressWarnings("all")
     private SpaceShip ship;
 
 

@@ -452,7 +452,7 @@ public class HubService {
      * Computes docking fee, refuels/repairs the ship, persists ship and depot, returns a printable breakdown.
      */
     public DockingFeeBreakdown billDockedShipWithBreakdown(UUID shipId) {
-        final double FUEL_COST_PER_UNIT = 2.5;
+        final double FUEL_COST_PER_UNIT = 5;
         final double REPAIR_COST_PER_UNIT = 15.0;
 
         SpaceShip dockedShip = findDockedShipById(shipId);
@@ -472,14 +472,14 @@ public class HubService {
         switch (dockedShip) {
             case CargoShip _ -> {
                 baseFee = 500.0;
-                serviceMultiplier = 1.5;
+                serviceMultiplier = 3.8;
             }
             case ScoutShip _ -> {
                 baseFee = 100.0;
                 serviceMultiplier = 1.0;
             }
             case FighterShip _ -> {
-                baseFee = 200;
+                baseFee = 250;
                 serviceMultiplier = 1.2;
             }
             default ->

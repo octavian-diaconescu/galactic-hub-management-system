@@ -187,7 +187,7 @@ public class HubServiceTest {
         double bill = hubService.calculateDockingFeesPerShip(cargoShip.getId());
 
         // Assert
-        assertEquals(1137.5, bill, "Billing calculation for CargoShip is incorrect");
+        assertEquals(2590.0, bill, "Billing calculation for CargoShip is incorrect");
         assertEquals(100, cargoShip.getFuelLevel(), "Fuel should be refilled to 100");
         assertEquals(100, cargoShip.getHullIntegrity(), "Hull should be repaired to 100");
     }
@@ -208,7 +208,7 @@ public class HubServiceTest {
         double totalRevenue = hubService.calculateTotalDockingFees();
 
         // Assert
-        assertEquals(1412.5, totalRevenue, "Total revenue aggregation is incorrect");
+        assertEquals(2890.0, totalRevenue, "Total revenue aggregation is incorrect");
     }
 
     @Test

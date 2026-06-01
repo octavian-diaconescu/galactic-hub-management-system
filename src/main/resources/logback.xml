@@ -12,6 +12,7 @@
         <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
             <fileNamePattern>logs/galactic-hub.%d{yyyy-MM-dd}.log</fileNamePattern>
             <maxHistory>30</maxHistory>
+            <totalSizeCap>3GB</totalSizeCap>
         </rollingPolicy>
         <encoder>
             <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} %-5level [%thread] %logger{36} - %msg%n</pattern>
@@ -24,6 +25,7 @@
         <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
             <fileNamePattern>logs/audit.%d{yyyy-MM-dd}.csv</fileNamePattern>
             <maxHistory>90</maxHistory>
+            <totalSizeCap>3GB</totalSizeCap>
         </rollingPolicy>
         <encoder>
             <pattern>%msg%n</pattern>
@@ -41,7 +43,7 @@
         <appender-ref ref="CSV_AUDIT"/>
     </logger>
 
-<!--     Hibernate: only warnings -->
+    <!-- Hibernate: only warnings -->
     <logger name="org.hibernate" level="WARN"/>
 
     <!-- Root fallback -->
