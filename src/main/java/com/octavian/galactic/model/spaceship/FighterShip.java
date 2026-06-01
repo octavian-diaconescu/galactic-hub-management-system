@@ -29,7 +29,7 @@ public class FighterShip extends SpaceShip {
     @Column(name = "ammunition_count", nullable = false)
     private int ammunitionCount;
 
-   @Transient
+    @Transient
     private boolean weaponsArmed;
 
    protected FighterShip(){}

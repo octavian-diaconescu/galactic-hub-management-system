@@ -23,6 +23,7 @@ public class CargoShip extends SpaceShip {
 
     @OneToMany(mappedBy = "cargoShip", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<CargoManifestEntry> cargoManifestLine = new ArrayList<>();
+
     private static final Logger logger = LoggerFactory.getLogger(CargoShip.class);
 
     protected CargoShip() {}
@@ -62,7 +63,6 @@ public class CargoShip extends SpaceShip {
     public void addCargoItem(CargoItem item, int quantity) {
         if (item == null || quantity <= 0) {
             logger.warn("[LOGISTICS] Cannot insert a null item or with a quantity of 0");
-//            System.out.println("[LOGISTICS] Cannot insert a null item or with a quantity of 0!");
             return;
         }
         double currentWeight = cargoManifestLine.stream()
@@ -87,8 +87,7 @@ public class CargoShip extends SpaceShip {
                         e -> e.addQuantity(quantity),
                         () -> cargoManifestLine.add(new CargoManifestEntry(this, item, quantity)));
         logger.info("[LOGISTICS] Loaded {} with [{}] x '{}'", this.getName(), quantity, item.getName());
-        AuditService.getInstance().log(AuditService.Action.CARGO_LOADED, this.getName(), "Loaded with " + quantity + " x '" + item.getName());
-//        System.out.printf("[LOGISTICS] Loaded %s with [%d] x '%s' %n", this.getName(), quantity, item.getName());
+        AuditService.getInstance().log(AuditService.Action.CARGO_LOADED, this.getName(), "Loaded with " + quantity + " x " + item.getName());
     }
 
     public Map<CargoItem, Integer> getCargoManifest(){
@@ -102,7 +101,7 @@ public class CargoShip extends SpaceShip {
                         LinkedHashMap::new
                 ));
 
-        return Collections.unmodifiableMap(new LinkedHashMap<>(temporaryMap));
+        return Collections.unmodifiableMap(temporaryMap);
     }
 
     public void printCargoManifest() {

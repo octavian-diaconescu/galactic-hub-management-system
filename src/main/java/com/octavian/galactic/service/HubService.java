@@ -81,7 +81,6 @@ public class HubService {
         }
         if (dockingBays.containsValue(dockingBay)) {
             logger.info("Docking bay '{}' already exists.", dockingBay.getName());
-//            System.out.println("Docking bay '" + dockingBay.getName() + "' already exists.");
             return;
         }
         dockingBay.setBayNumber(++dockingBayNumber);
@@ -153,7 +152,6 @@ public class HubService {
         }
         if (registeredShips.contains(ship)) {
             logger.info("[HUB] Error: Ship '{}' already in history", ship.getName());
-//            System.out.printf("[HUB] Error: Ship '%s' already in history%n", ship.getName());
             return;
         }
         registeredShips.add(ship);
@@ -452,7 +450,7 @@ public class HubService {
      * Computes docking fee, refuels/repairs the ship, persists ship and depot, returns a printable breakdown.
      */
     public DockingFeeBreakdown billDockedShipWithBreakdown(UUID shipId) {
-        final double FUEL_COST_PER_UNIT = 2.5;
+        final double FUEL_COST_PER_UNIT = 5;
         final double REPAIR_COST_PER_UNIT = 15.0;
 
         SpaceShip dockedShip = findDockedShipById(shipId);
@@ -472,14 +470,14 @@ public class HubService {
         switch (dockedShip) {
             case CargoShip _ -> {
                 baseFee = 500.0;
-                serviceMultiplier = 1.5;
+                serviceMultiplier = 3.8;
             }
             case ScoutShip _ -> {
                 baseFee = 100.0;
                 serviceMultiplier = 1.0;
             }
             case FighterShip _ -> {
-                baseFee = 200;
+                baseFee = 250;
                 serviceMultiplier = 1.2;
             }
             default ->
@@ -556,8 +554,7 @@ public class HubService {
 
     private double calculateCargoWeight(CargoShip ship) {
         if (ship == null) {
-            logger.warn("CargoShip cannot be null.");
-            return -1.0;
+            throw new IllegalArgumentException("ship is null");
         }
 
         return ship.getCargoManifest().entrySet().stream()
@@ -679,8 +676,7 @@ public class HubService {
         if (fuelDepot != null) {
             fuelDepotDetails = fuelDepotDetails.setAt0(fuelDepot.getFuelLevel());
             fuelDepotDetails = fuelDepotDetails.setAt1(fuelDepot.getFuelCapacity());
-        }
-        else{
+        } else {
             throw new IllegalStateException("Fuel depot cannot be null");
         }
         return fuelDepotDetails;
