@@ -45,7 +45,7 @@
                 </padding>
                 <Button text="↻  Refresh" styleClass="toolbar-btn" onAction="#onRefresh"/>
                 <Region HBox.hgrow="ALWAYS"/>
-                <Label fx:id="themeToggle" text="☀  Light Mode" styleClass="theme-toggle"
+                <Label fx:id="themeToggle" text="🔆 Light Mode" styleClass="theme-toggle"
                        onMouseClicked="#onToggleTheme"/>
             </HBox>
         </VBox>
